@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">فطور</string>
+    <string name="add_to_order">إضافة إلى الطلب</string>
+    <string name="available_items">العناصر المتاحة</string>
+    <string name="no_items_available">لا توجد عناصر متاحة</string>
+    <string name="price">السعر</string>
+    <string name="quantity">الكمية</string>
+    <string name="qty">عدد</string>
+    <string name="add">أضف</string>
+    <string name="select_user">اختر المستخدم</string>
+    <string name="choose_user">اختر مستخدمًا لإسناد العنصر إليه</string>
+    <string name="home">الرئيسية</string>
+
+    <!-- Authentication strings -->
+    <string name="login">تسجيل الدخول</string>
+    <string name="phone_or_email">الهاتف أو البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="sign_in">تسجيل الدخول</string>
+    <string name="forgot_password">نسيت كلمة المرور؟</string>
+    <string name="create_account">إنشاء حساب</string>
+    <string name="login_failed">فشل تسجيل الدخول</string>
+    <string name="phone_number">رقم الهاتف</string>
+    <string name="create_account_short">إنشاء حساب</string>
+    <string name="invalid_phone_number">رقم هاتف غير صالح</string>
+    <string name="invalid_password">كلمة مرور غير صالحة أكثر من أو تساوي 8 أحرف</string>
+    <string name="invalid_email">بريد إلكتروني غير صالح</string>
+    <string name="invalid_name">اسم غير صالح</string>
+    <string name="dont_have_account">ليس لديك حساب؟</string>
+
+    <!-- Registration strings -->
+    <string name="sign_up">إنشاء حساب</string>
+    <string name="name">الاسم</string>
+    <string name="phone">الهاتف</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="registration_failed">فشل التسجيل</string>
+    <string name="password_mismatch">كلمات المرور غير متطابقة</string>
+    <string name="welcome">أهلًا وسهلًا 👋</string>
+
+    <!-- Forgot password flow -->
+    <string name="forgot_password_title">نسيت كلمة المرور</string>
+    <string name="failed_send_reset">فشل إرسال رمز الاستعادة</string>
+    <string name="send_reset_code">إرسال رمز الاستعادة</string>
+    <string name="verify_code_title">أدخل رمز التحقق</string>
+    <string name="code">الرمز</string>
+    <string name="invalid_code">رمز غير صالح</string>
+    <string name="verify">تحقق</string>
+
+    <!-- Reset password -->
+    <string name="reset_password_title">إعادة تعيين كلمة المرور</string>
+    <string name="new_password">كلمة مرور جديدة</string>
+    <string name="confirm_password">تأكيد كلمة المرور</string>
+    <string name="failed_reset_password">فشل إعادة تعيين كلمة المرور</string>
+    <string name="change_password">تغيير كلمة المرور</string>
+    <string name="update_password">تحديث كلمة المرور</string>
+    <string name="password_updated">تم تحديث كلمة المرور بنجاح</string>
+    <string name="failed_update_password">فشل تحديث كلمة المرور</string>
+    <string name="please_enter_new_password">الرجاء إدخال كلمة مرور جديدة</string>
+    <string name="pleaseEnterYourRegisteredEmailAndWeWillSendYouTheCode">يرجى إدخال بريدك الإلكتروني المسجل وسنرسل لك الرمز</string>
+
+    <!-- Change password -->
+    <string name="change_password_title">تغيير كلمة المرور</string>
+    <string name="current_password">كلمة المرور الحالية</string>
+    <string name="failed_change_password">فشل تغيير كلمة المرور</string>
+
+    <!-- Home screen -->
+    <string name="home_screen_title">الرئيسية</string>
+    <string name="failed_load_home">فشل تحميل الصفحة الرئيسية</string>
+    <string name="no_orders_available">لا توجد طلبات متاحة</string>
+    <string name="order">طلب</string>
+    <string name="status">الحالة</string>
+    <string name="open">فتح</string>
+
+    <!-- Notifications screen -->
+    <string name="notifications">الإشعارات</string>
+    <string name="failed_load_notifications">فشل تحميل الإشعارات</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="no_notifications">لا توجد إشعارات</string>
+    <string name="notification">إشعار</string>
+    <string name="mark_read">تعليم مقروء</string>
+    <string name="mark_all_read">تعليم الكل كمقروء</string>
+
+    <!-- History screen -->
+    <string name="history">التاريخ</string>
+    <string name="failed_load_history">فشل تحميل التاريخ</string>
+    <string name="no_history">لا يوجد تاريخ</string>
+    <string name="history_detail">تفاصيل التاريخ</string>
+    <string name="failed_load_order_detail">فشل تحميل تفاصيل الطلب</string>
+    <string name="no_items_in_order">لا توجد عناصر في هذا الطلب</string>
+    <string name="items">العناصر</string>
+    <string name="no_details_available">لا توجد تفاصيل متاحة</string>
+    <string name="date">التاريخ</string>
+    <string name="store">المتجر</string>
+    <string name="total_price">السعر الإجمالي</string>
+    <string name="tax">الضريبة</string>
+    <string name="delivery">التوصيل</string>
+    <string name="qty_label">الكمية</string>
+    <string name="note">ملاحظة</string>
+    <string name="price_label">السعر</string>
+    <string name="total">الإجمالي</string>
+    <string name="assign">إسناد</string>
+
+    <!-- Order details screen -->
+    <string name="order_details">تفاصيل الطلب</string>
+    <string name="add_item">إضافة عنصر</string>
+    <string name="failed_load_order_items">فشل تحميل عناصر الطلب</string>
+    <string name="no_items_in_your_order">لا توجد عناصر في طلبك بعد.</string>
+    <string name="stop_order">إيقاف الطلب</string>
+    <string name="close_order">إغلاق الطلب</string>
+    <string name="reopen_order">إعادة فتح الطلب</string>
+
+    <!-- Custom item screen -->
+    <string name="custom_item">عنصر مخصص</string>
+    <string name="item_name">اسم العنصر</string>
+    <string name="quantity_label">الكمية</string>
+    <string name="note_label">ملاحظة</string>
+    <string name="error">خطأ</string>
+    <string name="retry_action">إعادة المحاولة</string>
+    <string name="add_custom_item">إضافة عنصر مخصص</string>
+
+    <!-- Collector details -->
+    <string name="collector_details">تفاصيل المجمّع</string>
+    <string name="failed_load_collector">فشل تحميل عناصر المجمّع</string>
+    <string name="no_assigned_items">لا توجد عناصر مسندة.</string>
+    <string name="order_items">عناصر الطلب:</string>
+    <string name="custom_items">العناصر المخصصة:</string>
+
+    <!-- Profile screen -->
+    <string name="profile">الملف الشخصي</string>
+    <string name="failed_load_profile">فشل تحميل الملف الشخصي</string>
+    <string name="failed_update">فشل التحديث</string>
+    <string name="profile_updated">تم تحديث الملف الشخصي بنجاح</string>
+    <string name="save">حفظ</string>
+    <string name="change_password_button">تغيير كلمة المرور</string>
+    <string name="password_for_delete">كلمة المرور (للإزالة)</string>
+    <string name="failed_delete_account">فشل حذف الحساب</string>
+    <string name="account_deleted">تم حذف الحساب</string>
+    <string name="delete_account">حذف الحساب</string>
+    <string name="settings">الإعدادات</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="app_version">إصدار التطبيق</string>
+    <string name="failed_load_version">فشل تحميل الإصدار</string>
+    <string name="about_us">من نحن</string>
+    <string name="failed_load_content">فشل تحميل المحتوى</string>
+    <string name="language">اللغة</string>
+    <string name="english">الإنجليزية</string>
+    <string name="arabic">العربية</string>
+    <string name="back">رجوع</string>
+
+    <!-- Assignment screen -->
+    <string name="no_users_available">لا يوجد مستخدمون متاحون</string>
+    <string name="assignment_failed">فشل الإسناد</string>
+    <string name="assign_success">تم إسناد العنصر بنجاح</string>
+    <string name="full_name">الاسم الكامل</string>
+    <string name="have_account">لديك حساب</string>
+    <string name="continue_text">استمر</string>
+    <string name="reset_password_subtitle">reset_password_subtitle</string>
+    <string name="change_password_subtitle">change_password subtitle</string>
+    <string name="failed_verify_code">فشل التحقق من الرمز</string>
+
+    <!-- Dilog -->
+    <string name="try_again">حاول مرة أخرى</string>
+    <string name="something_went_wrong">حدث خطأ ما</string>
+    <string name="ok">حسنا"></string>
+    <string name="cancel">إلغاء الأمر</string>
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
+    <string name="close">غلق</string>
+    <string name="delete_account_title">حذف الحساب</string>
+    <string name="delete_account_message">هل أنت متأكد من أنك تريد حذف حسابك؟</string>
+    <string name="no_internet">لا يوجد اتصال بالإنترنت</string>
+
+    <string name="submit">حسنا</string>
+    <string name="welcome_back">مرحباً بك مرة أخرى 👋</string>
+    <string name="enter_the_4_digit_code">أدخل الرمز المكون من 4 أرقام</string>
+    <string name="authentication_code">رمز المصادقة</string>
+    <string name="enter_the_4_digit_code_we_just_texted_to_your_phone_number">أدخل الرمز المكون من 4 أرقام الذي أرسلناه للتو إلى بريدك الالكتروني:</string>
+    <string name="failed_mark_read">failed_mark_read</string>
+    <string name="invalid_phone">invalid phone</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="choose_source">Choose Source</string>
+    <string name="change_profile_picture">Change Profile Picture</string>
+    <string name="failed_logout">Failed Log Out</string>
+    <string name="personal_details">Personal Details</string>
+    <string name="edit">Edit</string>
+    <string name="update">Update</string>
+    <string name="log_out">Log Out</string>
+    <string name="confirm">Confirm</string>
+    <string name="are_you_sure_to_logout">Are you sure to logout?</string>
+    <string name="select_store">Select Store</string>
+    <string name="table">Table</string>
+    <string name="list">List</string>
+    <string name="order_info">Order Info</string>
+    <string name="action">Action</string>
+    <string name="added_items">Added Items</string>
+    <string name="add_note_optional">Add Note Optional</string>
+    <string name="note_placeholder">Note ...</string>
+    <string name="order_for_others">Order For Others</string>
+    <string name="select_item">Select Item</string>
+    <string name="delete">Delete</string>
+    <string name="are_you_sure_delete_item">Are You Sure Delete Item?</string>
+    <string name="collector_view">Collector View</string>
+    <string name="update_now">Update Now</string>
+    <string name="update_required">Update Required</string>
+    <string name="update_required_message">A new version of the app is required. Please update to continue.</string>
+
+
+</resources>

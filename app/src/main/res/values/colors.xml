@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="alto">#FFCECECE</color>
+    <color name="apple">#FF666666</color>
+    <color name="blue_ribbon">#FF0058FF</color>
+    <color name="dove_gray">#FF666666</color>
+    <color name="french_gray">#FFBDC1CA</color>
+    <color name="governor_bay">#FF3E40C3</color>
+    <color name="punch">#FFDE3B40</color>
+    <color name="special_gray">#FF8F8F8F</color>
+    <color name="woodsmoke">#FF171A1F</color>
+    <color name="woodsmokefortf">#FF171A1F</color>
+</resources>

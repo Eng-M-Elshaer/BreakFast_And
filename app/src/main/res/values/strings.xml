@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Breakfast</string>
+    <string name="add_to_order">Add to Order</string>
+    <string name="available_items">Available Items</string>
+    <string name="no_items_available">No items available</string>
+    <string name="price">Price</string>
+    <string name="quantity">Quantity</string>
+    <string name="qty">Qty</string>
+    <string name="add">Add</string>
+    <string name="select_user">Select User</string>
+    <string name="choose_user">Choose a user to assign</string>
+    <string name="home">Home</string>
+
+    <!-- Authentication strings -->
+    <string name="login">Login</string>
+    <string name="phone_or_email">Phone or Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="create_account">Create Account</string>
+    <string name="login_failed">Login failed</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="create_account_short">Create Account</string>
+    <string name="invalid_phone_number">Invalid phone number</string>
+    <string name="invalid_password">Invalid password more than or equal to 8 characters</string>
+    <string name="invalid_email">Invalid email</string>
+    <string name="invalid_name">Invalid name</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+
+    <!-- Registration strings -->
+    <string name="sign_up">Sign Up</string>
+    <string name="name">Name</string>
+    <string name="phone">Phone</string>
+    <string name="email">Email</string>
+    <string name="registration_failed">Registration failed</string>
+    <string name="password_mismatch">Passwords do not match</string>
+    <string name="welcome">Welcome 👋</string>
+
+    <!-- Forgot password flow -->
+    <string name="forgot_password_title">Forgot Password</string>
+    <string name="failed_send_reset">Failed to send reset code</string>
+    <string name="send_reset_code">Send Reset Code</string>
+    <string name="verify_code_title">Enter Verification Code</string>
+    <string name="code">Code</string>
+    <string name="invalid_code">Invalid code</string>
+    <string name="verify">Verify</string>
+
+    <!-- Reset password -->
+    <string name="reset_password_title">Reset Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="failed_reset_password">Failed to reset password</string>
+    <string name="change_password">Change Password</string>
+    <string name="update_password">Update Password</string>
+    <string name="password_updated">Password updated successfully</string>
+    <string name="failed_update_password">Failed to update password</string>
+    <string name="please_enter_new_password">Please enter new password</string>
+    <string name="pleaseEnterYourRegisteredEmailAndWeWillSendYouTheCode">Please enter your registered email and we will send you the code</string>
+
+    <!-- Change password -->
+    <string name="change_password_title">Change Password</string>
+    <string name="current_password">Current Password</string>
+    <string name="failed_change_password">Failed to change password</string>
+
+    <!-- Home screen -->
+    <string name="home_screen_title">Home</string>
+    <string name="failed_load_home">Failed to load home data</string>
+    <string name="no_orders_available">No orders available</string>
+    <string name="order">Order</string>
+    <string name="status">Status</string>
+    <string name="open">Open</string>
+
+    <!-- Notifications screen -->
+    <string name="notifications">Notifications</string>
+    <string name="failed_load_notifications">Failed to load notifications</string>
+    <string name="retry">Retry</string>
+    <string name="no_notifications">No notifications</string>
+    <string name="notification">Notification</string>
+    <string name="mark_read">Mark Read</string>
+    <string name="mark_all_read">Mark all read</string>
+
+    <!-- History screen -->
+    <string name="history">History</string>
+    <string name="failed_load_history">Failed to load history</string>
+    <string name="no_history">No history available</string>
+    <string name="history_detail">History Detail</string>
+    <string name="failed_load_order_detail">Failed to load order details</string>
+    <string name="no_items_in_order">No items in this order</string>
+    <string name="items">Items</string>
+    <string name="no_details_available">No details available</string>
+    <string name="date">Date</string>
+    <string name="store">Store</string>
+    <string name="total_price">Total Price</string>
+    <string name="tax">Tax</string>
+    <string name="delivery">Delivery</string>
+    <string name="qty_label">Qty</string>
+    <string name="note">Note</string>
+    <string name="price_label">Price</string>
+    <string name="total">Total</string>
+    <string name="assign">Assign</string>
+
+    <!-- Order details screen -->
+    <string name="order_details">Order Details</string>
+    <string name="add_item">Add Item</string>
+    <string name="failed_load_order_items">Failed to load order items</string>
+    <string name="no_items_in_your_order">No items in your order yet.</string>
+    <string name="stop_order">Stop Order</string>
+    <string name="close_order">Close Order</string>
+    <string name="reopen_order">Reopen Order</string>
+
+    <!-- Custom item screen -->
+    <string name="custom_item">Custom Item</string>
+    <string name="item_name">Item Name</string>
+    <string name="quantity_label">Quantity</string>
+    <string name="note_label">Note</string>
+    <string name="error">Error</string>
+    <string name="retry_action">Retry</string>
+    <string name="add_custom_item">Add Custom Item</string>
+
+    <!-- Collector details -->
+    <string name="collector_details">Collector Details</string>
+    <string name="failed_load_collector">Failed to load collector items</string>
+    <string name="no_assigned_items">No assigned items.</string>
+    <string name="order_items">Order Items:</string>
+    <string name="custom_items">Custom Items:</string>
+
+    <!-- Profile screen -->
+    <string name="profile">Profile</string>
+    <string name="failed_load_profile">Failed to load profile</string>
+    <string name="failed_update">Failed to update</string>
+    <string name="profile_updated">Profile updated successfully</string>
+    <string name="save">Save</string>
+    <string name="change_password_button">Change Password</string>
+    <string name="password_for_delete">Password (for delete)</string>
+    <string name="failed_delete_account">Failed to delete account</string>
+    <string name="account_deleted">Account deleted</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="settings">Settings</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="app_version">App Version</string>
+    <string name="failed_load_version">Failed to load version</string>
+    <string name="about_us">About Us</string>
+    <string name="failed_load_content">Failed to load content</string>
+    <string name="language">Language</string>
+    <string name="english">English</string>
+    <string name="arabic">Arabic</string>
+    <string name="back">Back</string>
+
+    <!-- Assignment screen -->
+    <string name="no_users_available">No users available</string>
+    <string name="assignment_failed">Assignment failed</string>
+    <string name="assign_success">Item assigned successfully</string>
+    <string name="full_name">Full Name</string>
+    <string name="have_account">Have an Account</string>
+    <string name="continue_text">Continue</string>
+    <string name="reset_password_subtitle">reset_password_subtitle</string>
+    <string name="change_password_subtitle">change_password_subtitle</string>
+    <string name="failed_verify_code">Failed Verify Code</string>
+
+    <!-- Dilog -->
+    <string name="try_again">Try Again</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="ok">OK"></string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="close">Close</string>
+    <string name="delete_account_title">Delete Account</string>
+    <string name="delete_account_message">Are you sure you want to delete your account?</string>
+    <string name="no_internet">No Internet Connection</string>
+
+    <string name="submit">Submit</string>
+    <string name="welcome_back">Welcome Back 👋</string>
+    <string name="enter_the_4_digit_code">Enter the 4-digit code</string>
+    <string name="authentication_code">Authentication Code</string>
+    <string name="enter_the_4_digit_code_we_just_texted_to_your_phone_number">Enter the 4-digit code we just texted to your email:</string>
+    <string name="be_a_collector">Be a Collector</string>
+    <string name="start_collecting">Start Collecting</string>
+    <string name="failed_mark_read">failed_mark_read</string>
+    <string name="invalid_phone">invalid phone</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="choose_source">Choose Source</string>
+    <string name="change_profile_picture">Change Profile Picture</string>
+    <string name="failed_logout">Failed Log Out</string>
+    <string name="personal_details">Personal Details</string>
+    <string name="edit">Edit</string>
+    <string name="update">Update</string>
+    <string name="log_out">Log Out</string>
+    <string name="confirm">Confirm</string>
+    <string name="are_you_sure_to_logout">Are you sure to logout?</string>
+    <string name="select_store">Select Store</string>
+    <string name="table">Table</string>
+    <string name="list">List</string>
+    <string name="order_info">Order Info</string>
+    <string name="action">Action</string>
+    <string name="added_items">Added Items</string>
+    <string name="add_note_optional">Add Note Optional</string>
+    <string name="note_placeholder">Note ...</string>
+    <string name="order_for_others">Order For Others</string>
+    <string name="select_item">Select Item</string>
+    <string name="delete">Delete</string>
+    <string name="are_you_sure_delete_item">Are You Sure Delete Item?</string>
+    <string name="collector_view">Collector View</string>
+    <string name="update_now">Update Now</string>
+    <string name="update_required">Update Required</string>
+    <string name="update_required_message">A new version of the app is required. Please update to continue.</string>
+
+</resources>

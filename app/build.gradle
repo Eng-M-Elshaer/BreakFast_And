@@ -1,0 +1,88 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    namespace 'com.breakfast'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.breakfast"
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+    // استخدم نسخة مترجم Compose الموافقة لـ Compose 1.5
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.5.3'
+    }
+
+    packagingOptions {
+        resources {
+            excludes += ['/META-INF/{AL2.0,LGPL2.1}']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.core:core-ktx:1.13.1'
+    }
+}
+
+dependencies {
+    // Compose BOM لتوحيد نسخ مكونات Compose
+    implementation platform('androidx.compose:compose-bom:2023.09.01')
+    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    implementation 'androidx.compose.material:material-icons-extended'
+
+    // Coil for loading images in Compose
+    implementation 'io.coil-kt:coil-compose:2.6.0'
+
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
+    implementation 'androidx.navigation:navigation-compose:2.7.3'
+
+    // Retrofit / OkHttp / Moshi (aligned versions)
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-moshi:2.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    implementation 'com.squareup.moshi:moshi-kotlin:1.15.1'
+
+    // Coroutines (stable)
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+    // Security-crypto: استخدم إصدار مستقر لتفادي تضارب الـ AAR
+    implementation 'androidx.security:security-crypto:1.0.0'
+
+    // Firebase BOM وإشعارات FCM
+    implementation platform('com.google.firebase:firebase-bom:32.2.0')
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+
+    // أضف دعم AppCompat/Material
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+}
