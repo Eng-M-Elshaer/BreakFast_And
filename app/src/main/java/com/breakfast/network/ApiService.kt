@@ -177,6 +177,9 @@ interface ApiService {
     @GET("order-items")
     suspend fun collectorItems(): ApiResponse<CollectorModel>
 
+    @PUT("orders/{order_id}/stop")
+    suspend fun stopCollecting(@Path("order_id") orderId: Int): ApiResponse<HomeModel>
+
     /**
      * Detailed view of a historical order from the collector's perspective.
      */

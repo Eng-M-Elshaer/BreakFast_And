@@ -129,6 +129,10 @@ fun HomeScreen(navController: NavController? = null) {
                         val collectorId = item.collector?.id
                         collectorId != null && myId != null && collectorId == myId
                     }
+                    val myCollectOrder = itemsList.firstOrNull { item ->
+                        val collectorId = item.collector?.id
+                        collectorId != null && myId != null && collectorId == myId
+                    }
 
                     if (itemsList.isEmpty()) {
                         // Empty state
@@ -154,35 +158,6 @@ fun HomeScreen(navController: NavController? = null) {
                         }
 
                         Spacer(Modifier.height(12.dp))
-                        if (hasMyCollect) {
-                            BreakfastButtonRes(
-                                onClick = { /* TODO: start collecting action */ },
-                                enabled = true,
-                                isHasObserver = false,
-                                iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
-                            ) {
-                                Text(text = stringResource(R.string.start_collecting))
-                            }
-                        } else {
-                            BreakfastButtonRes(
-                                onClick = {
-                                    viewModel.fetchStores()
-                                    pendingStoreDialog.value = true
-                                },
-                                enabled = true,
-                                isHasObserver = false,
-                                iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
-                            ) {
-                                Text(text = stringResource(R.string.be_a_collector))
-                            }
-                        }
-                        Spacer(Modifier.height(8.dp))
                     } else {
                         // List of current orders
                         LazyColumn(
@@ -210,37 +185,40 @@ fun HomeScreen(navController: NavController? = null) {
                                 )
                             }
                         }
-
-                        if (hasMyCollect) {
-                            BreakfastButtonRes(
-                                onClick = { /* TODO: start collecting action */ },
-                                enabled = true,
-                                isHasObserver = false,
-                                iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
-                            ) {
-                                Text(text = stringResource(R.string.start_collecting))
-                            }
-                        } else {
-                            BreakfastButtonRes(
-                                onClick = {
-                                    viewModel.fetchStores()
-                                    pendingStoreDialog.value = true
-                                },
-                                enabled = true,
-                                isHasObserver = false,
-                                iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
-                            ) {
-                                Text(text = stringResource(R.string.be_a_collector))
-                            }
-                        }
-                        Spacer(Modifier.height(8.dp))
                     }
+                    if (hasMyCollect) {
+                        BreakfastButtonRes(
+                            onClick = {
+                                myCollectOrder?.let { order ->
+                                    navController?.navigate("collector_details")
+                                }
+                            },
+                            enabled = true,
+                            isHasObserver = false,
+                            iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(text = stringResource(R.string.start_collecting))
+                        }
+                    } else {
+                        BreakfastButtonRes(
+                            onClick = {
+                                viewModel.fetchStores()
+                                pendingStoreDialog.value = true
+                            },
+                            enabled = true,
+                            isHasObserver = false,
+                            iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(text = stringResource(R.string.be_a_collector))
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
                 }
             }
         }

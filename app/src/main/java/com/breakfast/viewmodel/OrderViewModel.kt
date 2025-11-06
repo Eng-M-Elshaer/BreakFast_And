@@ -51,6 +51,10 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
     private val _deleteItemState = MutableStateFlow<Result<Unit>?>(null)
     val deleteItemState = _deleteItemState.asStateFlow()
 
+    // Result state for stop collecting operation
+    private val _stopState = MutableStateFlow<Result<ApiResponse<HomeModel>>?>(null)
+    val stopState = _stopState.asStateFlow()
+
     /**
      * Fetch the current user's order items. Typically called when the order details
      * screen is first shown. Results are exposed via [orderItemsState].
@@ -129,6 +133,14 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
             _collectorState.value = Result.Loading
             val result = repository.getCollectorItems()
             _collectorState.value = result
+        }
+    }
+
+    fun stopCollecteing(oderID: Int) {
+        viewModelScope.launch {
+            _stopState.value = Result.Loading
+            val result = repository.stopCollecting(oderID)
+            _stopState.value = result
         }
     }
 

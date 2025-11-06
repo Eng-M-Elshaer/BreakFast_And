@@ -46,7 +46,8 @@ fun BreakfastButton(
     @DrawableRes iconRes: Int? = null,
     content: @Composable () -> Unit
 ) {
-    val useLightGrey = (!enabled) || isHasObserver || (isDanger && !enabled)
+    val isEffectivelyEnabled = enabled && !isHasObserver
+    val useLightGrey = (!isEffectivelyEnabled) || (isDanger && !enabled)
     val shape = RoundedCornerShape(cornerRadius)
 
     val backgroundModifier = when {
@@ -75,7 +76,7 @@ fun BreakfastButton(
         modifier = backgroundModifier
             .fillMaxWidth()
             .height(height)
-            .clickable(enabled = enabled, onClick = onClick)
+            .clickable(enabled = isEffectivelyEnabled, onClick = onClick)
             .testTag("BreakfastButton"),
         contentAlignment = Alignment.Center
     ) {
@@ -93,7 +94,7 @@ fun BreakfastButton(
                             contentDescription = null,
                             // Icon will inherit tint from LocalContentColor → same as text
                             modifier = Modifier
-                                .size(36.dp)
+                                .size(24.dp)
                                 .padding(end = 8.dp)
                         )
                     }

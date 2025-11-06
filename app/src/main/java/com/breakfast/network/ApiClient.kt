@@ -1,5 +1,6 @@
 package com.breakfast.network
 
+import com.google.android.datatransport.BuildConfig
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
@@ -45,7 +46,7 @@ object ApiClient {
         val requestBuilder = original.newBuilder()
             .header("Accept", "application/json")
             .header("CLIENT-TYPE", "android")
-            .header("CLIENT-VERSION", "1.0.0")
+            .header("CLIENT-VERSION", BuildConfig.VERSION_NAME)
         // Add the bearer token if available
         val token = tokenProvider?.invoke()
         if (!token.isNullOrEmpty()) {

@@ -134,6 +134,17 @@ data class CollectorModel(
     val count: Int?
 )
 
+data class CustomItemPayload(
+    val name: String = "",
+    val orderID: Int = 0,
+    val storeID: Int = 0,
+    val userID: Int = 0,
+    val price: Double = 0.0,
+    val quantity: Int = 0,
+    val note: String = "",
+    val orderItemID: Int = 0
+)
+
 @JsonClass(generateAdapter = true)
 data class CollectorHistoryModel(
     @Json(name = "users_items") val usersItems: List<UsersItem>?,

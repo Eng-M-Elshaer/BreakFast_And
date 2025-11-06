@@ -83,7 +83,7 @@ data class CreateOrderRequest(
 @JsonClass(generateAdapter = true)
 data class CustomItemRequest(
     @Json(name = "order_id") val orderId: Int? = null,
-    @Json(name = "item_name") val itemName: String,
+    @Json(name = "name") val itemName: String,
     val price: Double,
     val quantity: Int,
     val note: String? = null

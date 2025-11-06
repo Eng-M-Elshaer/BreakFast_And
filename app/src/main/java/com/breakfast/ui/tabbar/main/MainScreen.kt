@@ -42,6 +42,7 @@ import com.breakfast.ui.order.CollectorDetailsScreen
 import com.breakfast.ui.order.AssignItemScreen
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.res.colorResource
+import com.breakfast.models.CustomItemPayload
 import com.breakfast.ui.order.CustomItemScreen
 
 /**
@@ -202,13 +203,55 @@ fun MainScreen(rootNavController: NavController? = null) {
                 CustomItemScreen(orderId = orderId, onCreate = { navController.popBackStack() })
             }
             composable(
+                route = "custom_item?orderId={orderId}&name={name}&price={price}&quantity={quantity}&note={note}&storeId={storeId}&userId={userId}&orderItemId={orderItemId}",
+                arguments = listOf(
+                    navArgument("orderId") { type = NavType.IntType; defaultValue = 0 },
+                    navArgument("name") { type = NavType.StringType; defaultValue = "" },
+                    navArgument("price") { type = NavType.StringType; defaultValue = "0.0" },
+                    navArgument("quantity") { type = NavType.StringType; defaultValue = "0" },
+                    navArgument("note") { type = NavType.StringType; defaultValue = "" },
+                    navArgument("storeId") { type = NavType.IntType; defaultValue = 0 },
+                    navArgument("userId") { type = NavType.IntType; defaultValue = 0 },
+                    navArgument("orderItemId") { type = NavType.IntType; defaultValue = 0 },
+                )
+            ) { backStackEntry ->
+                val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
+                val name = backStackEntry.arguments?.getString("name").orEmpty()
+                val price = backStackEntry.arguments?.getString("price")?.toDoubleOrNull() ?: 0.0
+                val quantity = backStackEntry.arguments?.getString("quantity")?.toIntOrNull() ?: 0
+                val note = backStackEntry.arguments?.getString("note").orEmpty()
+                val storeId = backStackEntry.arguments?.getInt("storeId") ?: 0
+                val userId = backStackEntry.arguments?.getInt("userId") ?: 0
+                val orderItemId = backStackEntry.arguments?.getInt("orderItemId") ?: 0
+                CustomItemScreen(
+                    orderId = orderId,
+                    onCreate = { navController.popBackStack() },
+                    incoming = CustomItemPayload(
+                        name = name,
+                        orderID = orderId,
+                        storeID = storeId,
+                        userID = userId,
+                        price = price,
+                        quantity = quantity,
+                        note = note,
+                        orderItemID = orderItemId
+                    )
+                )
+            }
+            composable(
                 route = "order_closed/{orderId}",
                 arguments = listOf(navArgument("orderId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
                 OrderClosedScreen(orderId = orderId, onClose = { navController.popBackStack() }, onReopen = { navController.popBackStack() })
             }
-            composable("collector_details") { CollectorDetailsScreen() }
+            composable(
+                route = "collector_details",
+            ) { backStackEntry ->
+                CollectorDetailsScreen(
+                    navController = navController
+                )
+            }
 
             // History detail screen
             composable(

@@ -158,6 +158,21 @@ class OrderRepository(private val apiService: ApiService) {
     }
 
     /**
+     * Stop Collecting Orders
+     * */
+    suspend fun stopCollecting(orderId: Int): Result<ApiResponse<HomeModel>> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.stopCollecting(orderId)
+            Result.Success(response)
+        } catch (e: HttpException) {
+            Result.Error(e.response()?.errorBody()?.string())
+        } catch (e: IOException) {
+            Result.Error(e.message)
+        } catch (e: Exception) {
+            Result.Error(e.localizedMessage)
+        }
+    }
+    /**
      * Fetch a list of users for assigning order items. The backend returns a collection
      * of [PersonModel] objects representing potential assignees. On error, returns
      * [Result.Error].

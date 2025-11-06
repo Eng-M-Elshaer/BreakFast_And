@@ -13,14 +13,13 @@ android {
         minSdk 23
         targetSdk 35
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
     }
 
     buildFeatures {
         compose true
     }
 
-    // استخدم نسخة مترجم Compose الموافقة لـ Compose 1.5
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.3'
     }
@@ -48,7 +47,7 @@ configurations.all {
 }
 
 dependencies {
-    // Compose BOM لتوحيد نسخ مكونات Compose
+    // Compose BOM Compose
     implementation platform('androidx.compose:compose-bom:2023.09.01')
     implementation 'androidx.activity:activity-compose:1.7.2'
     implementation 'androidx.compose.ui:ui'
@@ -75,14 +74,14 @@ dependencies {
     // Coroutines (stable)
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
-    // Security-crypto: استخدم إصدار مستقر لتفادي تضارب الـ AAR
+    // Security-crypto: AAR
     implementation 'androidx.security:security-crypto:1.0.0'
 
-    // Firebase BOM وإشعارات FCM
+    // Firebase BOM FCM
     implementation platform('com.google.firebase:firebase-bom:32.2.0')
     implementation 'com.google.firebase:firebase-messaging-ktx'
 
-    // أضف دعم AppCompat/Material
+    // AppCompat/Material
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
 }
