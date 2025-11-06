@@ -1,5 +1,4 @@
 
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -9,8 +8,8 @@ import com.breakfast.utils.Validator
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import com.breakfast.designsystem.BreakfastButtonRes
+import com.breakfast.designsystem.BreakfastOutlinedTextField
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -104,39 +103,18 @@ private fun ForgotPasswordContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Email label + field
-            Text(
-                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.email),
-                fontWeight = FontWeight.SemiBold,
-                color = colorResource(id = com.breakfast.R.color.woodsmoke),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
-                placeholder = { Text(stringResource(id = com.breakfast.R.string.email)) },
-                singleLine = true,
+                label = stringResource(id = com.breakfast.R.string.email),
                 isError = emailError != null,
+                errorText = emailError,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Done
                 ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        onSend()
-                        focusManager.clearFocus()
-                    }
-                ),
                 modifier = Modifier.fillMaxWidth()
             )
-            if (emailError != null) {
-                Text(
-                    text = emailError,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                )
-            }
 
             // Loading only; errors are shown via dialog at the screen layer
             when (sendState) {

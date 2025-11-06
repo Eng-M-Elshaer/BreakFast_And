@@ -7,8 +7,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.breakfast.network.ApiClient
 import com.breakfast.utils.Result
@@ -34,6 +33,8 @@ import androidx.compose.ui.res.stringResource
 import com.breakfast.R
 import com.breakfast.models.CustomItemPayload
 import com.breakfast.ui.components.ErrorDialog
+import com.breakfast.designsystem.BreakfastOutlinedTextField
+import androidx.compose.ui.text.input.KeyboardType
 
 /**
  * Screen for creating a custom item with a name, price, quantity and optional note.
@@ -53,11 +54,15 @@ fun CustomItemScreen(
     val price = remember { mutableStateOf(if (incoming != null) incoming.price.toString() else "") }
     val quantity = remember { mutableStateOf(if (incoming != null && incoming.quantity != 0) incoming.quantity.toString() else "") }
     val note = remember { mutableStateOf(incoming?.note ?: "") }
+    val nameError = remember { mutableStateOf<String?>(null) }
+    val quantityError = remember { mutableStateOf<String?>(null) }
+    val priceError = remember { mutableStateOf<String?>(null) }
     val customItemState by viewModel.customItemState.collectAsState()
 
     val showError = remember { mutableStateOf(false) }
     val errorMsg = remember { mutableStateOf("") }
     val defaultErrorText = stringResource(id = R.string.something_went_wrong)
+    val requiredText = stringResource(id = R.string.required)
 
     LaunchedEffect(customItemState) {
         when (customItemState) {
@@ -73,7 +78,8 @@ fun CustomItemScreen(
     }
 
     val isButtonDisabled = { n: String, q: String, p: String ->
-        n.isBlank() || q.isBlank() || p.isBlank()
+        n.isBlank() || q.isBlank() || p.isBlank() ||
+            nameError.value != null || quantityError.value != null || priceError.value != null
     }
 
     val scrollState = rememberScrollState()
@@ -106,71 +112,63 @@ fun CustomItemScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = stringResource(id = R.string.name), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = name.value,
-                onValueChange = { name.value = it },
+                onValueChange = {
+                    name.value = it
+                    nameError.value = if (it.isBlank()) requiredText else null
+                },
+                label = stringResource(id = R.string.name),
+                isError = nameError.value != null,
+                errorText = nameError.value,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 6.dp),
-                shape = RoundedCornerShape(24.dp),
-                singleLine = true,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    unfocusedBorderColor = Color(0xFFE0E0E0),
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    containerColor = Color.White
-                )
+                    .padding(top = 6.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.quantity_label), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = quantity.value,
-                onValueChange = { txt -> quantity.value = txt.filter { it.isDigit() } },
+                onValueChange = { txt ->
+                    val filtered = txt.filter { it.isDigit() }
+                    quantity.value = filtered
+                    quantityError.value = if (filtered.isEmpty()) requiredText else null
+                },
+                label = stringResource(id = R.string.quantity_label),
+                isError = quantityError.value != null,
+                errorText = quantityError.value,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 6.dp),
-                shape = RoundedCornerShape(24.dp),
-                singleLine = true,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    unfocusedBorderColor = Color(0xFFE0E0E0),
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    containerColor = Color.White
-                )
+                    .padding(top = 6.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.price_label), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = price.value,
-                onValueChange = { txt -> price.value = txt.filter { ch -> ch.isDigit() || ch == '.' } },
+                onValueChange = { txt ->
+                    val filtered = txt.filter { ch -> ch.isDigit() || ch == '.' }
+                    price.value = filtered
+                    priceError.value = if (filtered.isEmpty()) requiredText else null
+                },
+                label = stringResource(id = R.string.price_label),
+                isError = priceError.value != null,
+                errorText = priceError.value,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 6.dp),
-                shape = RoundedCornerShape(24.dp),
-                singleLine = true,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    unfocusedBorderColor = Color(0xFFE0E0E0),
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    containerColor = Color.White
-                )
+                    .padding(top = 6.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.add_note_optional), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = note.value,
                 onValueChange = { note.value = it },
+                label = stringResource(id = R.string.add_note_optional),
+                isError = false,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 6.dp),
-                shape = RoundedCornerShape(24.dp),
-                singleLine = true,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    unfocusedBorderColor = Color(0xFFE0E0E0),
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    containerColor = Color.White
-                )
+                    .padding(top = 6.dp)
             )
 
             Spacer(modifier = Modifier.height(48.dp))

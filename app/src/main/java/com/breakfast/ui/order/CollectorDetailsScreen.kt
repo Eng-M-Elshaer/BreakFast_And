@@ -1,12 +1,16 @@
 package com.breakfast.ui.order
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,12 +18,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,7 +48,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
+import com.breakfast.designsystem.BreakfastOutlinedTextField
 import com.breakfast.models.CustomItemPayload
+import com.breakfast.models.StatusNames
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 /**
@@ -56,9 +64,19 @@ fun CollectorDetailsScreen(
 ) {
     val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(ApiClient.apiService))
     val collectorState by viewModel.collectorState.collectAsState()
+    val stopState by viewModel.stopState.collectAsState()
+    val closeState by viewModel.closeState.collectAsState()
     val showUsersDialog = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     val selectedUsers = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<List<com.breakfast.models.Collector>>(emptyList()) }
+    val taxText = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
+    val deliveryText = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
+    val totalText = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
+    val taxError = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
+    val deliveryError = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    // Add derived flag for stopped UI
+    val isStoppedUi = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.status?.name == com.breakfast.models.StatusNames.Stopped || stopState is com.breakfast.utils.Result.Success
 
     // Load collector items on first composition
     LaunchedEffect(Unit) { viewModel.fetchCollectorItems() }
@@ -94,6 +112,32 @@ fun CollectorDetailsScreen(
                     viewModel.stopCollecteing(orderId)
                 }
             },
+            onCloseCollecting = {
+                val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
+                if (orderId != null) {
+                    val tax = taxText.value.toDoubleOrNull() ?: 0.0
+                    val delivery = deliveryText.value.toDoubleOrNull() ?: 0.0
+                    val total = totalText.value.toDoubleOrNull() ?: 0.0
+                    viewModel.closeCollecting(orderId, tax, delivery, total)
+                }
+            },
+            showStoppedUi = isStoppedUi,
+            collectorTax = taxText.value,
+            collectorDelivery = deliveryText.value,
+            collectorTotal = totalText.value,
+            onTaxChange = {
+                taxText.value = it
+                taxError.value = if (it.isNotEmpty() && it.toDoubleOrNull() == null) {
+                    "Invalid number"
+                } else null
+            },
+            onDeliveryChange = {
+                deliveryText.value = it
+                deliveryError.value = if (it.isNotEmpty() && it.toDoubleOrNull() == null) {
+                    "Invalid number"
+                } else null
+            },
+            onTotalChange = { totalText.value = it },
             onShowUsers = { users ->
                 selectedUsers.value = users
                 showUsersDialog.value = true
@@ -107,6 +151,8 @@ fun CollectorDetailsScreen(
             onDismissUsers = { showUsersDialog.value = false },
             showUsersDialog = showUsersDialog.value,
             selectedUsers = selectedUsers.value,
+            collectorTaxError = taxError.value,
+            collectorDeliveryError = deliveryError.value,
             modifier = Modifier
                 .padding(paddingValues)
                 .padding(16.dp)
@@ -119,6 +165,16 @@ private fun CollectorDetailsContent(
     state: com.breakfast.utils.Result<com.breakfast.models.ApiResponse<com.breakfast.models.CollectorModel>>?,
     onBack: () -> Unit,
     onStopCollecting: () -> Unit,
+    onCloseCollecting: () -> Unit,
+    showStoppedUi: Boolean,
+    collectorTax: String,
+    collectorDelivery: String,
+    collectorTotal: String,
+    collectorTaxError: String?,
+    collectorDeliveryError: String?,
+    onTaxChange: (String) -> Unit,
+    onDeliveryChange: (String) -> Unit,
+    onTotalChange: (String) -> Unit,
     onShowUsers: (List<com.breakfast.models.Collector>) -> Unit,
     onCustomItemClick: (CustomItemPayload) -> Unit,
     onDismissUsers: () -> Unit,
@@ -126,7 +182,12 @@ private fun CollectorDetailsContent(
     selectedUsers: List<com.breakfast.models.Collector>,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(scrollState)
+    ) {
         when (val s = state) {
             is Result.Loading -> {
                 CircularProgressIndicator()
@@ -139,22 +200,22 @@ private fun CollectorDetailsContent(
                 if (data == null || (data.orderItems.isNullOrEmpty() && data.customOrderItems.isNullOrEmpty())) {
                     Box(
                         modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .height(280.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_assigned_items))
                     }
                 } else {
+                    // keep the existing rendering for active case (the long block you already have)
                     Column(
                         modifier = Modifier
-                            .weight(1f)
                             .fillMaxWidth()
                     ) {
                         // Order items section
                         if (!data.orderItems.isNullOrEmpty()) {
                             Text(
-                                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.order_items),
+                                text = stringResource(id = R.string.order_items),
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 20.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
@@ -164,7 +225,7 @@ private fun CollectorDetailsContent(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(
-                                        color = colorResource(com.breakfast.R.color.blue_ribbon),
+                                        color = colorResource(R.color.blue_ribbon),
                                         shape = RoundedCornerShape(
                                             topStart = 24.dp,
                                             topEnd = 24.dp
@@ -297,7 +358,7 @@ private fun CollectorDetailsContent(
                         // Custom items section
                         if (!data.customOrderItems.isNullOrEmpty()) {
                             Text(
-                                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.custom_items),
+                                text = stringResource(id = R.string.custom_items),
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 20.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
@@ -372,7 +433,6 @@ private fun CollectorDetailsContent(
                                                         modifier = Modifier
                                                             .size(24.dp)
                                                             .padding(end = 8.dp)
-                                                            .weight(0.1f)
                                                     )
                                                 }
                                             }
@@ -381,18 +441,92 @@ private fun CollectorDetailsContent(
                                 }
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        // Order info section
+                        if (showStoppedUi) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.White, RoundedCornerShape(24.dp))
+                                    .border(width = 1.dp, color = Color(0xFFE5E5E5), shape = RoundedCornerShape(24.dp))
+                                    .padding(16.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.order_info),
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 20.sp,
+                                    modifier = Modifier.padding(bottom = 12.dp)
+                                )
+
+                                Text(
+                                    text = "${stringResource(com.breakfast.R.string.quantity)}: ${data.count}",
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    modifier = Modifier.padding(bottom = 12.dp)
+                                )
+
+                                BreakfastOutlinedTextField(
+                                    value = collectorTax,
+                                    onValueChange = onTaxChange,
+                                    label = stringResource(id = R.string.tax),
+                                    isError = collectorTaxError != null,
+                                    errorText = collectorTaxError,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 12.dp)
+                                )
+
+                                BreakfastOutlinedTextField(
+                                    value = collectorDelivery,
+                                    onValueChange = onDeliveryChange,
+                                    label = stringResource(id = R.string.delivery),
+                                    isError = collectorDeliveryError != null,
+                                    errorText = collectorDeliveryError,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 12.dp)
+                                )
+
+                                Divider(modifier = Modifier.padding(vertical = 12.dp))
+
+                                OutlinedTextField(
+                                    value = data.order?.totalPrice.toString(),
+                                    enabled = false,
+                                    onValueChange = onTotalChange,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    label = { Text(text = stringResource(id = R.string.total)) },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(16.dp)
+                                )
+                            }
+                        }
                     }
 
-                    BreakfastButtonRes(
-                        onClick = onStopCollecting,
-                        enabled = true,
-                        isHasObserver = false,
-                        iconRes = com.breakfast.R.drawable.xmark_circle_fill,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                    ) {
-                        androidx.compose.material3.Text(text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.stop_collecting))
+                    if (showStoppedUi) {
+                        BreakfastButtonRes(
+                            onClick = onCloseCollecting,
+                            enabled = true,
+                            isHasObserver = false,
+                            iconRes = com.breakfast.R.drawable.xmark_circle_fill,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, bottom = 16.dp)
+                        ) {
+                            Text(text = stringResource(id = com.breakfast.R.string.close_order))
+                        }
+                    } else {
+                        BreakfastButtonRes(
+                            onClick = onStopCollecting,
+                            enabled = true,
+                            isHasObserver = false,
+                            iconRes = com.breakfast.R.drawable.xmark_circle_fill,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, bottom = 16.dp)
+                        ) {
+                            Text(text = stringResource(id = com.breakfast.R.string.stop_collecting))
+                        }
                     }
                 }
             }
@@ -471,6 +605,16 @@ private fun CollectorDetailsScreenPreview() {
         state = fakeResponse,
         onBack = {},
         onStopCollecting = {},
+        onCloseCollecting = {},
+        showStoppedUi = true,
+        collectorTax = "0.0",
+        collectorDelivery = "0.0",
+        collectorTotal = "0.0",
+        collectorTaxError = null,
+        collectorDeliveryError = null,
+        onTaxChange = {},
+        onDeliveryChange = {},
+        onTotalChange = {},
         onShowUsers = {},
         onCustomItemClick = {},
         onDismissUsers = {},

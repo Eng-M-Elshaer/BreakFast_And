@@ -8,9 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -18,7 +17,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -36,8 +34,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -46,13 +44,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.breakfast.BreakfastApplication
 import com.breakfast.designsystem.BreakfastButtonRes
+import com.breakfast.designsystem.BreakfastOutlinedTextField
 import com.breakfast.network.ApiClient
 import com.breakfast.ui.components.ErrorDialog
 import com.breakfast.utils.Result
 import com.breakfast.utils.Validator
 import com.breakfast.viewmodel.AuthViewModel
 import com.breakfast.viewmodel.AuthViewModelFactory
-
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -184,92 +182,54 @@ private fun ResetPasswordContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             // New Password label + field
-            Text(
-                text = stringResource(id = com.breakfast.R.string.new_password),
-                fontWeight = FontWeight.SemiBold,
-                color = colorResource(id = com.breakfast.R.color.woodsmoke),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = newPassword,
                 onValueChange = onNewPasswordChange,
-                placeholder = { Text(stringResource(id = com.breakfast.R.string.new_password)) },
-                singleLine = true,
+                label = stringResource(id = com.breakfast.R.string.new_password),
                 isError = newPasswordError != null,
+                errorText = newPasswordError,
                 visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                trailing = {
                     IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
                         Icon(
                             imageVector = if (passwordVisible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                             contentDescription = null
                         )
                     }
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = { confirmFocus.requestFocus() }),
-                modifier = Modifier
-                    .fillMaxWidth()
+                }
             )
-            if (newPasswordError != null) {
-                Text(
-                    text = newPasswordError,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                )
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Confirm Password label + field
-            Text(
-                text = stringResource(id = com.breakfast.R.string.confirm_password),
-                fontWeight = FontWeight.SemiBold,
-                color = colorResource(id = com.breakfast.R.color.woodsmoke),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = confirmPassword,
                 onValueChange = onConfirmPasswordChange,
-                placeholder = { Text(stringResource(id = com.breakfast.R.string.confirm_password)) },
-                singleLine = true,
+                label = stringResource(id = com.breakfast.R.string.confirm_password),
                 isError = confirmPasswordError != null,
+                errorText = confirmPasswordError,
                 visualTransformation = if (confirmPasswordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(confirmFocus),
+                trailing = {
                     IconButton(onClick = { confirmPasswordVisible.value = !confirmPasswordVisible.value }) {
                         Icon(
                             imageVector = if (confirmPasswordVisible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                             contentDescription = null
                         )
                     }
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        onChangePassword()
-                        focusManager.clearFocus()
-                    }
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(confirmFocus)
+                }
             )
-            if (confirmPasswordError != null) {
-                Text(
-                    text = confirmPasswordError,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                )
-            }
 
             // Loading only; errors are shown via dialog in the screen layer
             when (resetState) {

@@ -18,8 +18,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import com.breakfast.designsystem.BreakfastOutlinedTextField
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -59,6 +59,7 @@ import androidx.compose.ui.res.stringResource
 import com.breakfast.R
 import com.breakfast.models.ApiResponse
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 
@@ -380,67 +381,53 @@ private fun ProfileContent(
         )
     }
 
-    OutlinedTextField(
+    BreakfastOutlinedTextField(
         value = nameState.value,
         onValueChange = {
             if (!nameTouched.value) nameTouched.value = true
             nameState.value = it
         },
-        label = { Text(androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.name)) },
-        enabled = isEditing,
+        label = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.name),
         isError = nameTouched.value && !Validator.isValidFullName(nameState.value),
+        errorText = if (nameTouched.value && !Validator.isValidFullName(nameState.value)) {
+            androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.invalid_name)
+        } else null,
+        enabled = isEditing,
         modifier = Modifier.fillMaxWidth()
     )
-    if (nameTouched.value && !Validator.isValidFullName(nameState.value)) {
-        Text(
-            text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.invalid_name),
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-    }
-    OutlinedTextField(
+    BreakfastOutlinedTextField(
         value = phoneState.value,
         onValueChange = {
             if (!phoneTouched.value) phoneTouched.value = true
             phoneState.value = it
         },
-        label = { Text(androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.phone)) },
-        enabled = isEditing,
+        label = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.phone),
         isError = phoneTouched.value && !Validator.isValidEgyptianPhoneNumber(phoneState.value),
+        errorText = if (phoneTouched.value && !Validator.isValidEgyptianPhoneNumber(phoneState.value)) {
+            androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.invalid_phone)
+        } else null,
+        enabled = isEditing,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp)
     )
-    if (phoneTouched.value && !Validator.isValidEgyptianPhoneNumber(phoneState.value)) {
-        Text(
-            text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.invalid_phone),
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-    }
-    OutlinedTextField(
+    BreakfastOutlinedTextField(
         value = emailState.value,
         onValueChange = {
             if (!emailTouched.value) emailTouched.value = true
             emailState.value = it
         },
-        label = { Text(androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.email)) },
-        enabled = isEditing,
+        label = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.email),
         isError = emailTouched.value && !Validator.isValidEmail(emailState.value),
+        errorText = if (emailTouched.value && !Validator.isValidEmail(emailState.value)) {
+            androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.invalid_email)
+        } else null,
+        enabled = isEditing,
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp)
     )
-    if (emailTouched.value && !Validator.isValidEmail(emailState.value)) {
-        Text(
-            text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.invalid_email),
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-    }
 
     if (updateState is Result.Loading) {
         CircularProgressIndicator(modifier = Modifier.padding(top = 8.dp))

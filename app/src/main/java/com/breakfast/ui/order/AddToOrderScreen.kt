@@ -31,8 +31,10 @@ import com.breakfast.viewmodel.OrderViewModel
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
+import com.breakfast.designsystem.BreakfastOutlinedTextField
+import androidx.compose.ui.text.input.KeyboardType
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 /**
@@ -166,24 +168,23 @@ fun AddToOrderScreen(
             // 2. Quantity
             Text(text = stringResource(id = R.string.quantity), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = quantity,
                 onValueChange = { value -> quantity = value.filter { it.isDigit() } },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                singleLine = true
+                label = stringResource(id = R.string.quantity),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             // 3. Note (optional)
             Text(text = stringResource(id = R.string.add_note_optional), fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = note,
                 onValueChange = { note = it },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                placeholder = { Text(text = stringResource(id = R.string.note_placeholder)) }
+                label = stringResource(id = R.string.add_note_optional),
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -444,12 +445,11 @@ private fun AddToOrderScreenPreview() {
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "Quantity", fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = "2",
                 onValueChange = {},
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                singleLine = true
+                label = "Quantity",
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "Added Items", fontWeight = FontWeight.SemiBold)

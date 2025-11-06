@@ -180,6 +180,12 @@ interface ApiService {
     @PUT("orders/{order_id}/stop")
     suspend fun stopCollecting(@Path("order_id") orderId: Int): ApiResponse<HomeModel>
 
+    @PUT("orders/{order_id}/close")
+    suspend fun closeCollecting(
+        @Path("order_id") orderId: Int,
+        @Body body: CloseOrderRequest
+    ): ApiResponse<HomeModel>
+
     /**
      * Detailed view of a historical order from the collector's perspective.
      */

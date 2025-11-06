@@ -57,6 +57,7 @@ import com.breakfast.utils.Validator
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import com.breakfast.ui.components.ErrorDialog
+import com.breakfast.designsystem.BreakfastOutlinedTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -226,186 +227,104 @@ private fun SignUpScreenContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         // Full name
-        Text(
-            text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.full_name),
-            fontWeight = FontWeight.SemiBold,
-            color = colorResource(id = com.breakfast.R.color.woodsmoke),
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
+        BreakfastOutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            placeholder = { Text(stringResource(id = com.breakfast.R.string.full_name)) },
-            singleLine = true,
+            label = stringResource(id = com.breakfast.R.string.full_name),
             isError = nameError != null,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { phoneFocus.requestFocus() }),
-            modifier = Modifier
-                .fillMaxWidth()
+            errorText = nameError,
+            modifier = Modifier.fillMaxWidth()
         )
-        if (nameError != null) {
-            Text(
-                text = nameError,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp)
-            )
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Phone
-        Text(
-            text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.phone_number),
-            fontWeight = FontWeight.SemiBold,
-            color = colorResource(id = com.breakfast.R.color.woodsmoke),
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
+        BreakfastOutlinedTextField(
             value = phone,
             onValueChange = onPhoneChange,
-            placeholder = { Text(stringResource(id = com.breakfast.R.string.phone_number)) },
-            singleLine = true,
+            label = stringResource(id = com.breakfast.R.string.phone_number),
             isError = phoneError != null,
+            errorText = phoneError,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Phone,
                 imeAction = ImeAction.Next
             ),
-            keyboardActions = KeyboardActions(onNext = { emailFocus.requestFocus() }),
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(phoneFocus)
         )
-        if (phoneError != null) {
-            Text(
-                text = phoneError,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp)
-            )
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Email
-        Text(
-            text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.email),
-            fontWeight = FontWeight.SemiBold,
-            color = colorResource(id = com.breakfast.R.color.woodsmoke),
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
+        BreakfastOutlinedTextField(
             value = email,
             onValueChange = onEmailChange,
-            placeholder = { Text(stringResource(id = com.breakfast.R.string.email)) },
-            singleLine = true,
+            label = stringResource(id = com.breakfast.R.string.email),
             isError = emailError != null,
+            errorText = emailError,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
             ),
-            keyboardActions = KeyboardActions(onNext = { passwordFocus.requestFocus() }),
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(emailFocus)
         )
-        if (emailError != null) {
-            Text(
-                text = emailError,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp)
-            )
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Password
-        Text(
-            text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.password),
-            fontWeight = FontWeight.SemiBold,
-            color = colorResource(id = com.breakfast.R.color.woodsmoke),
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
+        BreakfastOutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            placeholder = { Text(stringResource(id = com.breakfast.R.string.password)) },
-            singleLine = true,
+            label = stringResource(id = com.breakfast.R.string.password),
             isError = passwordError != null,
+            errorText = passwordError,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Next
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(passwordFocus),
+            trailing = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                         contentDescription = null
                     )
                 }
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = { confirmFocus.requestFocus() }),
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(passwordFocus)
+            }
         )
-        if (passwordError != null) {
-            Text(
-                text = passwordError,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp)
-            )
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Confirm Password
-        Text(
-            text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.confirm_password),
-            fontWeight = FontWeight.SemiBold,
-            color = colorResource(id = com.breakfast.R.color.woodsmoke),
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
+        BreakfastOutlinedTextField(
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
-            placeholder = { Text(stringResource(id = com.breakfast.R.string.confirm_password)) },
-            singleLine = true,
+            label = stringResource(id = com.breakfast.R.string.confirm_password),
             isError = confirmError != null,
+            errorText = confirmError,
             visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(confirmFocus),
+            trailing = {
                 IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                     Icon(
                         imageVector = if (confirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                         contentDescription = null
                     )
                 }
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(confirmFocus)
+            }
         )
-        if (confirmError != null) {
-            Text(
-                text = confirmError,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp)
-            )
-        }
 
         // State handling (show loader only; errors via dialog)
         when (registerState) {

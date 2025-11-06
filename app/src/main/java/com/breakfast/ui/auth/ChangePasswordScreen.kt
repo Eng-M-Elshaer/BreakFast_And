@@ -1,5 +1,7 @@
 
 package com.breakfast.ui.auth
+import com.breakfast.designsystem.BreakfastOutlinedTextField
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +19,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,13 +39,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import com.breakfast.BreakfastApplication
 import com.breakfast.designsystem.BreakfastButtonRes
 import com.breakfast.network.ApiClient
@@ -191,134 +190,81 @@ private fun ChangePasswordContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Current password
-            Text(
-                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.current_password),
-                fontWeight = FontWeight.SemiBold,
-                color = colorResource(id = com.breakfast.R.color.woodsmoke),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = currentPassword,
                 onValueChange = onCurrentPasswordChange,
-                placeholder = { Text(stringResource(id = com.breakfast.R.string.current_password)) },
-                singleLine = true,
+                label = stringResource(id = com.breakfast.R.string.current_password),
                 isError = currentError != null,
+                errorText = currentError,
                 visualTransformation = if (currentVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                trailing = {
                     IconButton(onClick = { currentVisible.value = !currentVisible.value }) {
                         Icon(
                             imageVector = if (currentVisible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                             contentDescription = null
                         )
                     }
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = { newFocus.requestFocus() }),
-                modifier = Modifier.fillMaxWidth()
+                }
             )
-            if (currentError != null) {
-                Text(
-                    text = currentError,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                )
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // New password
-            Text(
-                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.new_password),
-                fontWeight = FontWeight.SemiBold,
-                color = colorResource(id = com.breakfast.R.color.woodsmoke),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = newPassword,
                 onValueChange = onNewPasswordChange,
-                placeholder = { Text(stringResource(id = com.breakfast.R.string.new_password)) },
-                singleLine = true,
+                label = stringResource(id = com.breakfast.R.string.new_password),
                 isError = newError != null,
+                errorText = newError,
                 visualTransformation = if (newVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(newFocus),
+                trailing = {
                     IconButton(onClick = { newVisible.value = !newVisible.value }) {
                         Icon(
                             imageVector = if (newVisible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                             contentDescription = null
                         )
                     }
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = { confirmFocus.requestFocus() }),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(newFocus)
+                }
             )
-            if (newError != null) {
-                Text(
-                    text = newError,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                )
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Confirm password
-            Text(
-                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.confirm_password),
-                fontWeight = FontWeight.SemiBold,
-                color = colorResource(id = com.breakfast.R.color.woodsmoke),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
+            BreakfastOutlinedTextField(
                 value = confirmPassword,
                 onValueChange = onConfirmPasswordChange,
-                placeholder = { Text(stringResource(id = com.breakfast.R.string.confirm_password)) },
-                singleLine = true,
+                label = stringResource(id = com.breakfast.R.string.confirm_password),
                 isError = confirmError != null,
+                errorText = confirmError,
                 visualTransformation = if (confirmVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(confirmFocus),
+                trailing = {
                     IconButton(onClick = { confirmVisible.value = !confirmVisible.value }) {
                         Icon(
                             imageVector = if (confirmVisible.value) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                             contentDescription = null
                         )
                     }
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        onChangePassword()
-                        focusManager.clearFocus()
-                    }
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(confirmFocus)
+                }
             )
-            if (confirmError != null) {
-                Text(
-                    text = confirmError,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                )
-            }
 
             // Loading only; errors shown via dialog in screen layer
             when (changeState) {

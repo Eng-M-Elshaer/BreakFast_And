@@ -39,6 +39,12 @@ enum class StatusNames {
     Active, Stopped, Closed, Inactive
 }
 
+data class CloseOrderRequest(
+    val tax: Double,
+    val delivery: Double,
+    val total: Double
+)
+
 // Home and store models
 @JsonClass(generateAdapter = true)
 data class HomeModel(

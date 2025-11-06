@@ -55,6 +55,9 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
     private val _stopState = MutableStateFlow<Result<ApiResponse<HomeModel>>?>(null)
     val stopState = _stopState.asStateFlow()
 
+    private val _closeState = MutableStateFlow<Result<ApiResponse<HomeModel>>?>(null)
+    val closeState = _closeState.asStateFlow()
+
     /**
      * Fetch the current user's order items. Typically called when the order details
      * screen is first shown. Results are exposed via [orderItemsState].
@@ -141,6 +144,19 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
             _stopState.value = Result.Loading
             val result = repository.stopCollecting(oderID)
             _stopState.value = result
+        }
+    }
+
+    fun closeCollecting(
+        orderId: Int,
+        tax: Double,
+        delivery: Double,
+        total: Double
+    ) {
+        viewModelScope.launch {
+            _closeState.value = Result.Loading
+            val result = repository.closeCollecting(orderId, tax, delivery, total)
+            _closeState.value = result
         }
     }
 
