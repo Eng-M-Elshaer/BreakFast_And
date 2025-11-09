@@ -20,6 +20,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.breakfast.network.ApiClient
 import com.breakfast.utils.Result
 import com.breakfast.viewmodel.OrderViewModel
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material3.Surface
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 /**
@@ -74,5 +76,17 @@ fun OrderClosedScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OrderClosedScreenPreview() {
+    Surface {
+        OrderClosedScreen(
+            orderId = 123,
+            onClose = {},
+            onReopen = {}
+        )
     }
 }

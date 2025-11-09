@@ -210,6 +210,13 @@
     <string name="users">Users</string>
     <string name="descriptions">Descriptions</string>
     <string name="required">Required</string>
-
+    <string name="share">Share</string>
+    <string name="re_open_order">Re-Open Order</string>
+    <string name="price_with_currency">%1$.1f ج.م</string>
+    <string name="note_with_value">Note: %1$s</string>
+    <string name="info">Info</string>
+    <string name="quantity_with_value">الكمية: %1$s</string>
+    <string name="list_item_line">List Item Line</string>
+    <string name="receipt_loaded">Receipt Loaded</string>
 
 </resources>

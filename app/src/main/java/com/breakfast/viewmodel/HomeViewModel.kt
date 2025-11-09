@@ -26,6 +26,9 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
     private val _infoState = MutableStateFlow<Result< ApiResponse<List<VersionModel>>>>(Result.Loading)
     val infoState = _infoState.asStateFlow()
 
+    private val _startOrderState = MutableStateFlow<Result< ApiResponse<HomeModel>>>(Result.Loading)
+    val startOrderState = _startOrderState.asStateFlow()
+
     init {
         fetchHome()
     }
@@ -51,6 +54,14 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
             _infoState.value = Result.Loading
             val result = repository.getInfo()
             _infoState.value = result
+        }
+    }
+
+    fun startOrder(storeId: Int) {
+        viewModelScope.launch {
+            _startOrderState.value = Result.Loading
+            val result = repository.startOrder(storeId)
+            _startOrderState.value = result
         }
     }
 

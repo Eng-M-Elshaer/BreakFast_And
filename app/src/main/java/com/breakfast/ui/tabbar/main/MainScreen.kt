@@ -39,7 +39,6 @@ import com.breakfast.ui.settings.SettingsScreen
 import com.breakfast.ui.order.OrderDetailsScreen
 import com.breakfast.ui.order.OrderClosedScreen
 import com.breakfast.ui.order.CollectorDetailsScreen
-import com.breakfast.ui.order.AssignItemScreen
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.res.colorResource
 import com.breakfast.models.CustomItemPayload
@@ -169,18 +168,14 @@ fun MainScreen(rootNavController: NavController? = null) {
 
             // Order-related screens with dynamic arguments
             composable(
-                route = "order_details/{orderId}/{storeId}",
+                route = "order_details/{orderId}",
                 arguments = listOf(
                     navArgument("orderId") { type = NavType.IntType },
-                    navArgument("storeId") { type = NavType.IntType }
                 )
             ) { backStackEntry ->
                 val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
-                val storeId = backStackEntry.arguments?.getInt("storeId") ?: 0
                 OrderDetailsScreen(
                     orderId = orderId,
-                    onAddItem = { navController.navigate("add_to_order/${orderId}/${storeId}") },
-                    onClose = { navController.popBackStack() },
                     navController = navController
                 )
             }

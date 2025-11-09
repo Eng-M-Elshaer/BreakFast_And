@@ -1,5 +1,6 @@
-package com.breakfast.ui.order
 
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material3.Surface
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import com.breakfast.viewmodel.OrderViewModel
  * @param orderItemId the ID of the order item to assign
  * @param navController optional NavController for navigating back after assignment
  */
+
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun AssignItemScreen(
@@ -133,6 +135,51 @@ fun AssignItemScreen(
                     }
                 }
                 else -> {}
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AssignItemScreenPreview() {
+    Surface {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(text = "Assign")
+            LazyColumn {
+                items(
+                    listOf(
+                        PersonModel(id = 1, name = "User One", email = "one@mail.com", status = null, phone = "01000000001"),
+                        PersonModel(id = 2, name = "User Two", email = "two@mail.com", status = null, phone = "01000000002"),
+                        PersonModel(id = 3, name = "User Three", email = "three@mail.com", status = null, phone = "01000000003")
+                    )
+                ) { user ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        RadioButton(selected = false, onClick = { })
+                        Text(text = user.name ?: "-", modifier = Modifier.padding(start = 8.dp))
+                    }
+                }
+            }
+            Button(
+                onClick = {},
+                modifier = Modifier.padding(top = 16.dp)
+            ) {
+                Text("Assign")
+            }
+            Button(
+                onClick = {},
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text("Cancel")
             }
         }
     }

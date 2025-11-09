@@ -47,6 +47,7 @@ fun HomeScreen(navController: NavController? = null) {
     val homeState = viewModel.homeState.collectAsState()
     val storesState = viewModel.storeState.collectAsState()
     val infoState = viewModel.infoState.collectAsState()
+    val startOrderState = viewModel.startOrderState.collectAsState()
     val showSelectStore = remember { mutableStateOf(false) }
     val pendingStoreDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -70,6 +71,16 @@ fun HomeScreen(navController: NavController? = null) {
             }
             is Result.Error -> {
                 pendingStoreDialog.value = false
+            }
+            else -> {}
+        }
+    }
+
+    LaunchedEffect(startOrderState.value) {
+        when (startOrderState.value) {
+            is com.breakfast.utils.Result.Success -> {
+                // order started successfully, refresh home
+                viewModel.fetchHome()
             }
             else -> {}
         }
@@ -257,8 +268,11 @@ fun HomeScreen(navController: NavController? = null) {
             visible = showSelectStore.value && stores.isNotEmpty(),
             stores = stores,
             onDismiss = { showSelectStore.value = false },
-            onConfirm = { _ ->
+            onConfirm = { selectedStore ->
                 showSelectStore.value = false
+                if (selectedStore != null) {
+                    viewModel.startOrder(selectedStore.id ?: 0)
+                }
             }
         )
         if (showForceUpdate.value) {

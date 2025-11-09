@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
-
+import com.breakfast.network.StartOrderRequest
 /**
  * Repository to fetch data for the Home screen, such as current orders or stores list.
  */
@@ -18,6 +18,19 @@ class HomeRepository(private val apiService: ApiService) {
     suspend fun getHome(): Result<ApiResponse<List<HomeModel>>> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.home()
+            Result.Success(response)
+        } catch (e: HttpException) {
+            Result.Error(e.response()?.errorBody()?.string())
+        } catch (e: IOException) {
+            Result.Error(e.message)
+        } catch (e: Exception) {
+            Result.Error(e.localizedMessage)
+        }
+    }
+    suspend fun startOrder(storeId: Int): Result<ApiResponse<HomeModel>> = withContext(Dispatchers.IO) {
+        try {
+            val request = StartOrderRequest(storeId = storeId)
+            val response = apiService.startOrder(request)
             Result.Success(response)
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())

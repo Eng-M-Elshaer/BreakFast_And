@@ -1,7 +1,8 @@
+
 package com.breakfast.ui.order
+
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,7 +51,7 @@ import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
 import com.breakfast.designsystem.BreakfastOutlinedTextField
 import com.breakfast.models.CustomItemPayload
-import com.breakfast.models.StatusNames
+import com.breakfast.designsystem.CollectorOrderItemCard
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 /**
@@ -80,6 +81,15 @@ fun CollectorDetailsScreen(
 
     // Load collector items on first composition
     LaunchedEffect(Unit) { viewModel.fetchCollectorItems() }
+
+    LaunchedEffect(closeState) {
+        if (closeState is com.breakfast.utils.Result.Success) {
+            val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
+            if (orderId != null) {
+                navController?.navigate("order_details/$orderId")
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -296,58 +306,10 @@ private fun CollectorDetailsContent(
                                             )
                                             .padding(horizontal = 12.dp, vertical = 6.dp)
                                     ) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .background(Color.White, RoundedCornerShape(20.dp))
-                                                .padding(horizontal = 16.dp, vertical = 10.dp)
-                                        ) {
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Text(
-                                                    text = item.itemName ?: "--",
-                                                    fontSize = 12.sp,
-                                                    textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
-                                                )
-                                                Text(
-                                                    text = (item.quantity ?: 0).toString(),
-                                                    fontSize = 12.sp,
-                                                    textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
-                                                )
-                                                Text(
-                                                    text = "${item.price ?: 0.0} EGP",
-                                                    fontSize = 12.sp,
-                                                    textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
-                                                )
-                                                Text(
-                                                    text = "${item.totalPrice ?: 0.0} EGP",
-                                                    fontSize = 12.sp,
-                                                    textAlign = TextAlign.Center,
-                                                    modifier = Modifier.weight(1f)
-                                                )
-                                                IconButton(onClick = { onShowUsers(item.users ?: emptyList()) }) {
-                                                    Icon(
-                                                        painter = painterResource(id = R.drawable.ic_info),
-                                                        contentDescription = null,
-                                                        tint = Color(0xFF0D5BFF),
-                                                        modifier = Modifier.size(20.dp)
-                                                    )
-                                                }
-                                            }
-                                            if (!item.note.isNullOrEmpty()) {
-                                                Spacer(modifier = Modifier.size(6.dp))
-                                                Text(
-                                                    text = "${stringResource(com.breakfast.R.string.note)}: ${item.note}",
-                                                    color = colorResource(com.breakfast.R.color.punch),
-                                                    fontSize = 12.sp
-                                                )
-                                            }
-                                        }
+                                        CollectorOrderItemCard(
+                                            item = item,
+                                            onShowUsers = onShowUsers
+                                        )
                                     }
                                 }
                             }

@@ -39,6 +39,14 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
     private val _collectorState = MutableStateFlow<Result<ApiResponse<CollectorModel>>?>(null)
     val collectorState = _collectorState.asStateFlow()
 
+    private val _collectorHistoryState = MutableStateFlow<Result<ApiResponse<CollectorHistoryModel>>?>(null)
+
+    val collectorHistoryState = _collectorHistoryState.asStateFlow()
+
+    private val _receiptState = MutableStateFlow<Result<ApiResponse<List<ReceiptModel>>>?>(null)
+
+    val receiptState = _receiptState.asStateFlow()
+
     // Users state for assigning items
     private val _usersState = MutableStateFlow<Result<ApiResponse<List<PersonModel>>>?>(null)
     val usersState = _usersState.asStateFlow()
@@ -57,6 +65,9 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
 
     private val _closeState = MutableStateFlow<Result<ApiResponse<HomeModel>>?>(null)
     val closeState = _closeState.asStateFlow()
+
+    private val _reOpenState = MutableStateFlow<Result<ApiResponse<HomeModel>>?>(null)
+    val reOpenState = _reOpenState.asStateFlow()
 
     /**
      * Fetch the current user's order items. Typically called when the order details
@@ -139,6 +150,14 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
         }
     }
 
+    fun fetchCollectorHistoryItems(orderID: Int) {
+        viewModelScope.launch {
+            _collectorHistoryState.value = Result.Loading
+            val result = repository.getCollectorHistoryItems(orderID)
+            _collectorHistoryState.value = result
+        }
+    }
+
     fun stopCollecteing(oderID: Int) {
         viewModelScope.launch {
             _stopState.value = Result.Loading
@@ -157,6 +176,24 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
             _closeState.value = Result.Loading
             val result = repository.closeCollecting(orderId, tax, delivery, total)
             _closeState.value = result
+        }
+    }
+
+    fun reOpenCollecting(
+        orderId: Int
+    ) {
+        viewModelScope.launch {
+            _reOpenState.value = Result.Loading
+            val result = repository.reOpenCollecting(orderId)
+            _reOpenState.value = result
+        }
+    }
+
+    fun receipt(orderId: Int) {
+        viewModelScope.launch {
+            _receiptState.value = Result.Loading
+            val result = repository.receipt(orderId)
+            _receiptState.value = result
         }
     }
 

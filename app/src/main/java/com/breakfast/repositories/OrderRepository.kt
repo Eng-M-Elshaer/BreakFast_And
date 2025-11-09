@@ -156,6 +156,18 @@ class OrderRepository(private val apiService: ApiService) {
             Result.Error(e.localizedMessage)
         }
     }
+    suspend fun getCollectorHistoryItems(orderId: Int): Result<ApiResponse<CollectorHistoryModel>> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.collectorHistory(orderId)
+            Result.Success(response)
+        } catch (e: HttpException) {
+            Result.Error(e.response()?.errorBody()?.string())
+        } catch (e: IOException) {
+            Result.Error(e.message)
+        } catch (e: Exception) {
+            Result.Error(e.localizedMessage)
+        }
+    }
 
     /**
      * Stop Collecting Orders
@@ -172,7 +184,30 @@ class OrderRepository(private val apiService: ApiService) {
             Result.Error(e.localizedMessage)
         }
     }
-
+    suspend fun reOpenCollecting(orderId: Int): Result<ApiResponse<HomeModel>> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.reOpenCollecting(orderId)
+            Result.Success(response)
+        } catch (e: HttpException) {
+            Result.Error(e.response()?.errorBody()?.string())
+        } catch (e: IOException) {
+            Result.Error(e.message)
+        } catch (e: Exception) {
+            Result.Error(e.localizedMessage)
+        }
+    }
+    suspend fun receipt(orderId: Int): Result<ApiResponse<List<ReceiptModel>>> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.receipt(orderId)
+            Result.Success(response)
+        } catch (e: HttpException) {
+            Result.Error(e.response()?.errorBody()?.string())
+        } catch (e: IOException) {
+            Result.Error(e.message)
+        } catch (e: Exception) {
+            Result.Error(e.localizedMessage)
+        }
+    }
     suspend fun closeCollecting(
         orderId: Int,
         tax: Double,

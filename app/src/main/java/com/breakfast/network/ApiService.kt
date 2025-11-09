@@ -103,8 +103,9 @@ interface ApiService {
     /**
      * Start a new order in a selected store.
      */
+
     @POST("orders")
-    suspend fun startOrder(@Body request: StartOrderRequest): HomeModel
+    suspend fun startOrder(@Body request: StartOrderRequest): ApiResponse<HomeModel>
 
     /**
      * Retrieve the current user's items in the ongoing order.
@@ -154,7 +155,7 @@ interface ApiService {
      * Retrieve a receipt for a completed order.
      */
     @GET("orders/receipt")
-    suspend fun receipt(@Query("order_id") orderId: Int): ApiResponse<ReceiptModel>
+    suspend fun receipt(@Query("order_id") orderId: Int): ApiResponse<List<ReceiptModel>>
 
     // ---------------- History ----------------
     /**
@@ -186,6 +187,11 @@ interface ApiService {
         @Body body: CloseOrderRequest
     ): ApiResponse<HomeModel>
 
+
+    @PUT("orders/{order_id}/reopen")
+    suspend fun reOpenCollecting(
+        @Path("order_id") orderId: Int
+    ): ApiResponse<HomeModel>
     /**
      * Detailed view of a historical order from the collector's perspective.
      */

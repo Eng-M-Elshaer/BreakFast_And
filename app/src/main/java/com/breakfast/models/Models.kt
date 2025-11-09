@@ -162,6 +162,7 @@ data class CollectorHistoryModel(
 data class UsersItem(
     @Json(name = "user_id") val userID: Int?,
     @Json(name = "user_name") val userName: String?,
+    @Json(name = "user_image") val userImage: String?,
     @Json(name = "order_items") val orderItems: List<OrderItem>?,
     @Json(name = "total_quantity") val totalQuantity: Int?,
     @Json(name = "tax_delivery") val taxDelivery: Double?,
