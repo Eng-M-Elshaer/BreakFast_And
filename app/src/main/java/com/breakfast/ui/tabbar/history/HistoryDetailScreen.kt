@@ -316,7 +316,9 @@ fun HistoryDetailScreen(
                     Spacer(modifier = Modifier.weight(1f))
                     if (detail?.order?.collector?.id == myId) {
                         BreakfastButtonRes(
-                            onClick = { /* TODO: Go To Collector View */ },
+                            onClick = {
+                                navController?.navigate("order_details/$orderId")
+                            },
                             enabled = true,
                             isHasObserver = false,
                             iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,

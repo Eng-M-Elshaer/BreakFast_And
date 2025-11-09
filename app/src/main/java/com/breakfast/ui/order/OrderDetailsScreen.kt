@@ -242,58 +242,116 @@ fun OrderDetailsScreen(
         }
     }
 
-    // dialog for receipt
+    // dialog for receipt (now as a bottom sheet)
     if (showReceipt) {
-        when (val rs = receiptState.value) {
-            is Result.Loading -> {
-                AlertDialog(
-                    onDismissRequest = { showReceipt = false },
-                    title = { Text(stringResource(id = R.string.order_info)) },
-                    text = { CircularProgressIndicator() },
-                    confirmButton = {
-                        TextButton(onClick = { showReceipt = false }) {
-                            Text(text = stringResource(id = R.string.ok))
-                        }
+        val rs = receiptState.value
+        ModalBottomSheet(
+            onDismissRequest = { showReceipt = false },
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+        ) {
+            when (rs) {
+                is Result.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
-                )
-            }
-
-            is Result.Error -> {
-                AlertDialog(
-                    onDismissRequest = { showReceipt = false },
-                    title = { Text(stringResource(id = R.string.order_info)) },
-                    text = {
+                }
+                is Result.Error -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
                         Text(
-                            rs.message ?: stringResource(
-                                id = R.string.failed_load_order_items
-                            )
+                            text = stringResource(id = R.string.order_info),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold
                         )
-                    },
-                    confirmButton = {
-                        TextButton(onClick = { showReceipt = false }) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(text = rs.message ?: stringResource(id = R.string.failed_load_order_items))
+                        Spacer(Modifier.height(16.dp))
+                        BreakfastButtonRes(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { showReceipt = false }
+                        ) {
                             Text(text = stringResource(id = R.string.ok))
                         }
                     }
-                )
-            }
-
-            is Result.Success<*> -> {
-                AlertDialog(
-                    onDismissRequest = { showReceipt = false },
-                    title = { Text(stringResource(id = R.string.order_info)) },
-                    text = {
-                        Text(text = stringResource(id = R.string.receipt_loaded))
-                    },
-                    confirmButton = {
-                        TextButton(onClick = { showReceipt = false }) {
-                            Text(text = stringResource(id = R.string.ok))
+                }
+                is Result.Success<*> -> {
+                    // assume API returns CollectorHistoryModel-like receipt
+                    val receipt = rs.data
+                    val items = (receipt as? CollectorHistoryModel)?.usersItems.orEmpty()
+                    val orderInfo = (receipt as? CollectorHistoryModel)?.order
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(4.dp)
+                                .align(Alignment.CenterHorizontally)
+                                .background(Color.LightGray, RoundedCornerShape(999.dp))
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = stringResource(id = R.string.receipt),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 420.dp)
+                        ) {
+                            items(items) { user ->
+                                Text(
+                                    text = "#" + (user.userID ?: 0) + " — " + (user.userName ?: "-"),
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                user.orderItems.orEmpty().forEach { item ->
+                                    Text(
+                                        text = "- ${item.itemName.orEmpty()} x${item.quantity ?: 0} = ${item.total ?: 0.0}",
+                                        modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
+                                    )
+                                }
+                                Spacer(Modifier.height(8.dp))
+                            }
                         }
+                        Spacer(Modifier.height(12.dp))
+                        // summary like iOS: quantity, tax, delivery, total
+                        Divider()
+                        Spacer(Modifier.height(8.dp))
+                        ReceiptSummaryRow(
+                            label = stringResource(id = R.string.quantity),
+                            value = (orderInfo?.totalPrice ?: 0.0).toInt().toString()
+                        )
+                        ReceiptSummaryRow(
+                            label = stringResource(id = R.string.tax),
+                            value = stringResource(id = R.string.price_with_currency, orderInfo?.tax ?: 0.0)
+                        )
+                        ReceiptSummaryRow(
+                            label = stringResource(id = R.string.delivery),
+                            value = stringResource(id = R.string.price_with_currency, orderInfo?.delivery ?: 0.0)
+                        )
+                        ReceiptSummaryRow(
+                            label = stringResource(id = R.string.total_price),
+                            value = stringResource(id = R.string.price_with_currency, orderInfo?.totalPrice ?: 0.0),
+                            isBold = true
+                        )
+                        Spacer(Modifier.height(16.dp))
                     }
-                )
-            }
-
-            null -> {
-                showReceipt = false
+                }
+                null -> {
+                    showReceipt = false
+                }
             }
         }
     }
@@ -693,4 +751,18 @@ private fun createAndShareOrderPdf(context: Context, data: CollectorHistoryModel
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
     context.startActivity(Intent.createChooser(shareIntent, "Share order PDF"))
+}
+@Composable
+private fun ReceiptSummaryRow(label: String, value: String, isBold: Boolean = false) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, color = Color.Gray)
+        Text(
+            text = value,
+            fontWeight = if (isBold) FontWeight.SemiBold else FontWeight.Normal
+        )
+    }
+    Spacer(Modifier.height(6.dp))
 }

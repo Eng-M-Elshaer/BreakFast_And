@@ -220,5 +220,6 @@
     <string name="quantity_with_value">Quantity: %1$s</string>
     <string name="list_item_line">List Item Line</string>
     <string name="receipt_loaded">Receipt Loaded</string>
+    <string name="receipt">Receipt</string>
 
 </resources>
