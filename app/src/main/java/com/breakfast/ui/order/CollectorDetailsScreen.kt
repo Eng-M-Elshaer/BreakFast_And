@@ -55,6 +55,7 @@ import com.breakfast.designsystem.BreakfastOutlinedTextField
 import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.models.CustomItemPayload
 import com.breakfast.designsystem.CollectorOrderItemCard
+import com.breakfast.designsystem.CollectorTableHeader
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 /**
@@ -110,7 +111,49 @@ fun CollectorDetailsScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            if (isStoppedUi) {
+                BreakfastButtonRes(
+                    onClick = {
+                        val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
+                        if (orderId != null) {
+                            val tax = taxText.value.toDoubleOrNull() ?: 0.0
+                            val delivery = deliveryText.value.toDoubleOrNull() ?: 0.0
+                            val total = totalText.value.toDoubleOrNull() ?: 0.0
+                            viewModel.closeCollecting(orderId, tax, delivery, total)
+                        }
+                    },
+                    enabled = true,
+                    isHasObserver = false,
+                    iconRes = com.breakfast.R.drawable.xmark_circle_fill,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 16.dp)
+                ) {
+                    Text(text = stringResource(id = com.breakfast.R.string.close_order))
+                }
+            } else {
+                BreakfastButtonRes(
+                    onClick = {
+                        val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
+                        if (orderId != null) {
+                            viewModel.stopCollecteing(orderId)
+                        }
+                    },
+                    enabled = true,
+                    isHasObserver = false,
+                    iconRes = com.breakfast.R.drawable.xmark_circle_fill,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 16.dp)
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text(text = stringResource(id = com.breakfast.R.string.stop_collecting))
+                }
+            }
         }
+
     ) { paddingValues ->
         CollectorDetailsContent(
             state = collectorState,
@@ -223,16 +266,15 @@ private fun CollectorDetailsContent(
             is Result.Success -> {
                 val data = s.data.data
                 if (data == null || (data.orderItems.isNullOrEmpty() && data.customOrderItems.isNullOrEmpty())) {
-                    Box(
+                    BreakfastEmptyState(
+                        iconRes = R.drawable.no_orders,
+                        title = stringResource(id = R.string.no_assigned_items),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(280.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_assigned_items))
-                    }
+                            .height(260.dp)
+                    )
+                    Spacer(Modifier.height(12.dp))
                 } else {
-                    // keep the existing rendering for active case (the long block you already have)
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -259,50 +301,7 @@ private fun CollectorDetailsContent(
                                     .padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = stringResource(id = R.string.name),
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 4.dp)
-                                )
-                                Text(
-                                    text = stringResource(id = R.string.quantity),
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(horizontal = 4.dp)
-                                )
-                                Text(
-                                    text = stringResource(id = R.string.price),
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(horizontal = 4.dp)
-                                )
-                                Text(
-                                    text = stringResource(id = R.string.total),
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(horizontal = 4.dp)
-                                )
-                                Text(
-                                    text = stringResource(id = R.string.action),
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(horizontal = 4.dp)
-                                )
+                                CollectorTableHeader(showAction = true)
                             }
                             Column(
                                 modifier = Modifier.fillMaxWidth()
@@ -353,7 +352,7 @@ private fun CollectorDetailsContent(
                                     .padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "Descriptions", color = Color.White, modifier = Modifier.weight(1f))
+                                Text(text = stringResource(R.string.descriptions), color = Color.White, modifier = Modifier.weight(1f))
                             }
                             Column(
                                 modifier = Modifier.fillMaxWidth()
@@ -467,42 +466,13 @@ private fun CollectorDetailsContent(
 
                                 Divider(modifier = Modifier.padding(vertical = 12.dp))
 
-                                OutlinedTextField(
-                                    value = data.order?.totalPrice.toString(),
-                                    enabled = false,
-                                    onValueChange = onTotalChange,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    label = { Text(text = stringResource(id = R.string.total)) },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(16.dp)
+                                BreakfastOutlinedTextField(
+                                    value = data.order?.totalPrice?.toString() ?: "",
+                                    onValueChange = { onTotalChange },
+                                    label = stringResource(id = R.string.total),
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
-                        }
-                    }
-
-                    if (showStoppedUi) {
-                        BreakfastButtonRes(
-                            onClick = onCloseCollecting,
-                            enabled = true,
-                            isHasObserver = false,
-                            iconRes = com.breakfast.R.drawable.xmark_circle_fill,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp, bottom = 16.dp)
-                        ) {
-                            Text(text = stringResource(id = com.breakfast.R.string.close_order))
-                        }
-                    } else {
-                        BreakfastButtonRes(
-                            onClick = onStopCollecting,
-                            enabled = true,
-                            isHasObserver = false,
-                            iconRes = com.breakfast.R.drawable.xmark_circle_fill,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp, bottom = 16.dp)
-                        ) {
-                            Text(text = stringResource(id = com.breakfast.R.string.stop_collecting))
                         }
                     }
                 }

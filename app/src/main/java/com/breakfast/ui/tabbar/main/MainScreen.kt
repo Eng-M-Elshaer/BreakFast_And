@@ -64,8 +64,8 @@ private fun BreakfastBottomBar(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 24.dp)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 24.dp),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 8.dp
@@ -124,6 +124,7 @@ private fun BreakfastBottomBar(
 
 @Composable
 fun MainScreen(rootNavController: NavController? = null) {
+
     val navController = rememberNavController()
     val items = listOf(
         BottomNavItem.Home,
@@ -145,6 +146,7 @@ fun MainScreen(rootNavController: NavController? = null) {
     val shouldHideBottomBar = currentRoute != null && hideBottomBarPrefixes.any { prefix ->
         currentRoute.startsWith(prefix)
     }
+
     Scaffold(
         bottomBar = {
             if (!shouldHideBottomBar) {
@@ -157,13 +159,11 @@ fun MainScreen(rootNavController: NavController? = null) {
             startDestination = BottomNavItem.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
+            // Home-related screens
             composable(BottomNavItem.Home.route) { HomeScreen(navController) }
             composable(BottomNavItem.Notifications.route) { NotificationScreen(navController) }
             composable(BottomNavItem.History.route) { HistoryScreen(navController) }
-            composable(BottomNavItem.Profile.route) {
-                ProfileScreen(rootNavController ?: navController)
-            }
-
+            composable(BottomNavItem.Profile.route) { ProfileScreen(rootNavController ?: navController) }
             // Order-related screens with dynamic arguments
             composable(
                 route = "order_details/{orderId}",
@@ -177,6 +177,7 @@ fun MainScreen(rootNavController: NavController? = null) {
                     navController = navController
                 )
             }
+            // Add to order screen with dynamic arguments
             composable(
                 route = "add_to_order/{orderId}/{storeId}",
                 arguments = listOf(
@@ -188,6 +189,7 @@ fun MainScreen(rootNavController: NavController? = null) {
                 val storeId = backStackEntry.arguments?.getInt("storeId") ?: 0
                 AddToOrderScreen(orderId = orderId, storeId = storeId)
             }
+            // Custom item screen with dynamic arguments
             composable(
                 route = "custom_item/{orderId}",
                 arguments = listOf(navArgument("orderId") { type = NavType.IntType })
@@ -195,6 +197,7 @@ fun MainScreen(rootNavController: NavController? = null) {
                 val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
                 CustomItemScreen(orderId = orderId, onCreate = { navController.popBackStack() })
             }
+            // Custom item screen with dynamic arguments
             composable(
                 route = "custom_item?orderId={orderId}&name={name}&price={price}&quantity={quantity}&note={note}&storeId={storeId}&userId={userId}&orderItemId={orderItemId}",
                 arguments = listOf(
@@ -231,6 +234,7 @@ fun MainScreen(rootNavController: NavController? = null) {
                     )
                 )
             }
+            // Order closed screen with dynamic arguments
             composable(
                 route = "order_closed/{orderId}",
                 arguments = listOf(navArgument("orderId") { type = NavType.IntType })
@@ -238,6 +242,7 @@ fun MainScreen(rootNavController: NavController? = null) {
                 val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
                 OrderClosedScreen(orderId = orderId, onClose = { navController.popBackStack() }, onReopen = { navController.popBackStack() })
             }
+            // Collector details screen
             composable(
                 route = "collector_details",
             ) { backStackEntry ->

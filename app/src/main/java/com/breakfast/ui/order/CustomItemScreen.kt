@@ -102,6 +102,30 @@ fun CustomItemScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            BreakfastButtonRes(
+                iconRes = com.breakfast.R.drawable.plus,
+                isHasObserver = isButtonDisabled(name.value, quantity.value, price.value),
+                onClick = {
+                    val priceDouble = price.value.toDoubleOrNull() ?: 0.0
+                    val qtyInt = quantity.value.toIntOrNull() ?: 1
+                    val targetOrderId = if (incoming != null && incoming.orderID != 0) incoming.orderID else orderId
+                    viewModel.addCustomItem(
+                        targetOrderId,
+                        name.value,
+                        priceDouble,
+                        qtyInt,
+                        note.value.takeIf { it.isNotBlank() }
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp)
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(text = stringResource(R.string.add_custom_item))
+            }
         }
     ) { paddingValues ->
         Column(
@@ -174,29 +198,6 @@ fun CustomItemScreen(
             )
 
             Spacer(modifier = Modifier.height(48.dp))
-
-            // Button section fixed at bottom visually
-            BreakfastButtonRes(
-                iconRes = com.breakfast.R.drawable.plus,
-                isHasObserver = isButtonDisabled(name.value, quantity.value, price.value),
-                onClick = {
-                    val priceDouble = price.value.toDoubleOrNull() ?: 0.0
-                    val qtyInt = quantity.value.toIntOrNull() ?: 1
-                    val targetOrderId = if (incoming != null && incoming.orderID != 0) incoming.orderID else orderId
-                    viewModel.addCustomItem(
-                        targetOrderId,
-                        name.value,
-                        priceDouble,
-                        qtyInt,
-                        note.value.takeIf { it.isNotBlank() }
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp)
-            ) {
-                Text(text = stringResource(R.string.add_custom_item))
-            }
 
             if (showError.value) {
                 ErrorDialog(

@@ -67,8 +67,10 @@ fun HomeScreen(navController: NavController? = null) {
     LaunchedEffect(storesState.value) {
         when (storesState.value) {
             is Result.Success -> {
+                if (pendingStoreDialog.value) {
+                    showSelectStore.value = true
+                }
                 pendingStoreDialog.value = false
-                showSelectStore.value = true
             }
             is Result.Error -> {
                 pendingStoreDialog.value = false
@@ -77,12 +79,10 @@ fun HomeScreen(navController: NavController? = null) {
         }
     }
 
-    LaunchedEffect(storesState.value) {
-        when (storesState.value) {
+    LaunchedEffect(startOrderState.value) {
+        when (startOrderState.value) {
             is Result.Success -> {
-                if (pendingStoreDialog.value) {
-                    showSelectStore.value = true
-                }
+               viewModel.fetchHome()
                 pendingStoreDialog.value = false
             }
             is Result.Error -> {
@@ -116,7 +116,7 @@ fun HomeScreen(navController: NavController? = null) {
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(horizontal = 24.dp)
+                .padding(16.dp)
                 .fillMaxSize()
         ) {
             // Big title like the screenshot
@@ -269,9 +269,7 @@ fun HomeScreen(navController: NavController? = null) {
             onDismiss = { showSelectStore.value = false },
             onConfirm = { selectedStore ->
                 showSelectStore.value = false
-                if (selectedStore != null) {
-                    viewModel.startOrder(selectedStore.id ?: 0)
-                }
+                viewModel.startOrder(selectedStore.id ?: 0)
             }
         )
         if (showForceUpdate.value) {

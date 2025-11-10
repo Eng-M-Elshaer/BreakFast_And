@@ -162,7 +162,8 @@ fun ProfileScreen(navController: NavController? = null, isPreview: Boolean = fal
     ) { paddingValues ->
         Column(modifier = Modifier
             .padding(paddingValues)
-            .padding(16.dp)) {
+            .padding(16.dp)
+        ) {
             when (val state = profileState.value) {
                 is Result.Loading -> {
                     Box(

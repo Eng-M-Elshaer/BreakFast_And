@@ -209,7 +209,10 @@ enum class NotificationSubjectType(val value: String) {
     CLOSE("Order Closed"),
 
     @Json(name = "Order Stopped")
-    STOP("Order Stopped");
+    STOP("Order Stopped"),
+
+    @Json(name = "Order")
+    UNKNWON("Order");
 }
 
 @JsonClass(generateAdapter = true)

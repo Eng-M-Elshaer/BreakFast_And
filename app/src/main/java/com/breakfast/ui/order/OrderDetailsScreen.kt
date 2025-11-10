@@ -181,7 +181,7 @@ fun OrderDetailsScreen(
                     .fillMaxWidth()
                     .height(48.dp)
                     .background(
-                        color = Color(0xFFE5F0FF),
+                        color = colorResource(R.color.blue_ribbon),
                         shape = RoundedCornerShape(999.dp)
                     )
                     .padding(4.dp)
