@@ -44,7 +44,7 @@ fun CollectorOrderItemCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(20.dp))
+            .background(colorResource(id = R.color.card_bg), RoundedCornerShape(20.dp))
             .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
         Row(

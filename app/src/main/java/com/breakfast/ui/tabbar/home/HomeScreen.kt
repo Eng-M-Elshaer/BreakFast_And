@@ -33,6 +33,7 @@ import com.breakfast.designsystem.OrderCard
 import androidx.compose.ui.platform.LocalContext
 import com.breakfast.models.HomeModel
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.colorResource
 import com.breakfast.managers.PreferenceManager
 import com.breakfast.ui.components.SelectStoreDialog
 import com.breakfast.models.StoreModel
@@ -238,7 +239,7 @@ fun HomeScreen(navController: NavController? = null) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(24.dp),
-                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White)
+                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = colorResource(id = R.color.card_bg))
                 ) {
                     Box(
                         modifier = Modifier

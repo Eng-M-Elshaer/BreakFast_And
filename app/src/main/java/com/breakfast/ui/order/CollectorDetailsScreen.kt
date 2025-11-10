@@ -130,7 +130,8 @@ fun CollectorDetailsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp, bottom = 16.dp)
-                ) {
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    ) {
                     Text(text = stringResource(id = com.breakfast.R.string.close_order))
                 }
             } else {
@@ -352,7 +353,7 @@ private fun CollectorDetailsContent(
                                     .padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = stringResource(R.string.descriptions), color = Color.White, modifier = Modifier.weight(1f))
+                                Text(text = stringResource(R.string.descriptions), color = colorResource(id = R.color.card_bg), modifier = Modifier.weight(1f))
                             }
                             Column(
                                 modifier = Modifier.fillMaxWidth()
@@ -376,7 +377,7 @@ private fun CollectorDetailsContent(
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .background(
-                                                    Color.White,
+                                                    colorResource(id = R.color.card_bg),
                                                     shape = RoundedCornerShape(20.dp)
                                                 )
                                                 .padding(horizontal = 16.dp, vertical = 10.dp)
@@ -424,7 +425,7 @@ private fun CollectorDetailsContent(
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(Color.White, RoundedCornerShape(24.dp))
+                                    .background(colorResource(id = R.color.card_bg), RoundedCornerShape(24.dp))
                                     .border(width = 1.dp, color = Color(0xFFE5E5E5), shape = RoundedCornerShape(24.dp))
                                     .padding(16.dp)
                             ) {

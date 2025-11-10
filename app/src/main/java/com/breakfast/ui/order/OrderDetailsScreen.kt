@@ -42,6 +42,7 @@ import com.breakfast.designsystem.BreakfastButtonRes
 import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.designsystem.CollectorOrderItemCard
 import com.breakfast.designsystem.CollectorTableHeader
+import com.breakfast.designsystem.OrderInfoCard
 import com.breakfast.designsystem.TabChip
 import com.breakfast.models.ApiResponse
 import com.breakfast.models.CollectorHistoryModel
@@ -393,13 +394,13 @@ private fun CollectorTableSection(items: List<UsersItem>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colorResource(id = com.breakfast.R.color.background_grey), RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
             .padding(bottom = 16.dp)
     ) {
         items(items) { user ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(colorResource(id = com.breakfast.R.color.background_grey))
                     .padding(horizontal = 4.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -461,7 +462,7 @@ private fun ListViewSection(items: List<UsersItem>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(24.dp))
+            .background(colorResource(id = R.color.card_bg), RoundedCornerShape(24.dp))
             .padding(16.dp)
     ) {
         items.forEach { user ->
@@ -511,70 +512,6 @@ private fun ListViewSection(items: List<UsersItem>) {
                     )
                 }
             }
-        }
-    }
-}
-
-
-@Composable
-fun OrderInfoCard(
-    title: String = stringResource(id = R.string.order_info),
-    quantity: String,
-    tax: Double,
-    delivery: Double,
-    total: Double,
-    onInfoClick: (() -> Unit)? = null
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, Color(0xFFE5F0FF), RoundedCornerShape(24.dp))
-            .background(Color.White, RoundedCornerShape(24.dp))
-            .padding(16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f)
-            )
-            if (onInfoClick != null) {
-                IconButton(onClick = onInfoClick) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_info),
-                        contentDescription = stringResource(id = R.string.info),
-                        tint = Color(0xFF0F6BFF),
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-        Text(text = stringResource(id = R.string.quantity_with_value, quantity))
-
-        Spacer(Modifier.height(8.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = stringResource(id = R.string.tax))
-            Text(text = stringResource(id = R.string.price_with_currency, tax))
-        }
-        Spacer(Modifier.height(8.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = stringResource(id = R.string.delivery))
-            Text(text = stringResource(id = R.string.price_with_currency, delivery))
-        }
-        Spacer(Modifier.height(8.dp))
-        Divider()
-        Spacer(Modifier.height(8.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = stringResource(id = R.string.total))
-            Text(
-                text = stringResource(id = R.string.price_with_currency, total),
-                fontWeight = FontWeight.Bold
-            )
         }
     }
 }

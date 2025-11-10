@@ -11,8 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.breakfast.R
 
 @Composable
 fun TabChip(
@@ -31,7 +33,7 @@ fun TabChip(
     ) {
         Text(
             text = text,
-            color = if (selected) Color.Black else Color.White,
+            color = if (selected) Color.Black else colorResource(id = R.color.card_bg),
             fontWeight = FontWeight.SemiBold
         )
     }

@@ -1,5 +1,4 @@
 
-import com.breakfast.ui.order.OrderInfoCard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +44,7 @@ import com.breakfast.designsystem.BreakfastButtonRes
 import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.designsystem.CollectorOrderItemCard
 import com.breakfast.designsystem.CollectorTableHeader
+import com.breakfast.designsystem.OrderInfoCard
 import com.breakfast.designsystem.TabChip
 import com.breakfast.managers.PreferenceManager
 import com.breakfast.ui.components.BreakfastEmptyState
@@ -84,7 +84,6 @@ fun HistoryDetailScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(colorResource(id = com.breakfast.R.color.background_grey), RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             when (val state = detailState) {
@@ -174,7 +173,7 @@ fun HistoryDetailScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(20.dp))
-                                    .background(Color.White)
+                                    .background(colorResource(id = R.color.card_bg))
                                     .padding(16.dp)
                             ) {
                                 items.forEach { item ->
@@ -338,7 +337,7 @@ private fun HistoryDetailPreviewContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Color.White)
+                        .background(colorResource(id = R.color.card_bg))
                         .padding(16.dp)
                 ) {
                     items.forEach { item ->

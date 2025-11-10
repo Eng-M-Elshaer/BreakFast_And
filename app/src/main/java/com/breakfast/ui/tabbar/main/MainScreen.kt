@@ -40,6 +40,7 @@ import com.breakfast.ui.order.OrderClosedScreen
 import com.breakfast.ui.order.CollectorDetailsScreen
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.res.colorResource
+import com.breakfast.R
 import com.breakfast.models.CustomItemPayload
 import com.breakfast.ui.order.CustomItemScreen
 
@@ -114,7 +115,7 @@ private fun BreakfastBottomBar(
                     Icon(
                         painter = painterResource(id = item.icon),
                         contentDescription = stringResource(id = item.labelRes),
-                        tint = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = if (selected) colorResource(id = R.color.card_bg) else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

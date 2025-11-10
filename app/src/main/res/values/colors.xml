@@ -11,4 +11,5 @@
     <color name="woodsmoke">#FF171A1F</color>
     <color name="woodsmokefortf">#FF171A1F</color>
     <color name="background_grey">#FFF5F5F5</color>
+    <color name="card_bg">#FFFFFF</color>
 </resources>

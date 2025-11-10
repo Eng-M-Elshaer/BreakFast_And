@@ -20,7 +20,7 @@ import com.breakfast.R
 
 @Composable
 fun CollectorTableHeader(showAction: Boolean = false) {
-    val fontColor = Color.White
+    val fontColor = colorResource(id = R.color.card_bg)
     val backgroundColor = colorResource(id = com.breakfast.R.color.blue_ribbon)
     val fontSize = 12.sp
 

@@ -56,7 +56,7 @@ fun ErrorDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.card_bg)),
             shape = MaterialTheme.shapes.medium
         ) {
             Column(
@@ -124,7 +124,7 @@ fun ConfirmDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.card_bg)),
             shape = MaterialTheme.shapes.medium
         ) {
             Column(
@@ -204,7 +204,7 @@ fun SelectStoreDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.card_bg)),
             shape = MaterialTheme.shapes.medium
         ) {
             Column(
