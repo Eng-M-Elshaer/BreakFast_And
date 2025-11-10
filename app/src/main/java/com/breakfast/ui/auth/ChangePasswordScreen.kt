@@ -44,6 +44,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalContext
 import com.breakfast.BreakfastApplication
 import com.breakfast.designsystem.BreakfastButtonRes
 import com.breakfast.network.ApiClient
@@ -58,12 +59,14 @@ import com.breakfast.viewmodel.AuthViewModelFactory
 @Composable
 fun ChangePasswordScreen(navController: NavController? = null) {
 
+    val context = LocalContext.current
+    val preferenceManager = BreakfastApplication.get().preferenceManager
+    val apiService = remember { ApiClient.apiService }
+    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService, context))
+
     val currentPassword = remember { mutableStateOf("") }
     val newPassword = remember { mutableStateOf("") }
     val confirmPassword = remember { mutableStateOf("") }
-    val preferenceManager = BreakfastApplication.get().preferenceManager
-    val apiService = remember { ApiClient.apiService }
-    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService))
     val changeState = viewModel.changePasswordState.collectAsState(null)
     val defaultFailed = stringResource(id = com.breakfast.R.string.failed_change_password)
     val showError = remember { mutableStateOf(false) }

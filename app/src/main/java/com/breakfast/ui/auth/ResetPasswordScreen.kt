@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -59,7 +60,8 @@ fun ResetPasswordScreen(email: String, code: String, navController: NavControlle
     val confirmPassword = remember { mutableStateOf("") }
     val preferenceManager = BreakfastApplication.get().preferenceManager
     val apiService = remember { ApiClient.apiService }
-    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService))
+    val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService, context))
     val resetState = viewModel.resetPasswordState.collectAsState(null)
 
     val defaultFailed = stringResource(id = com.breakfast.R.string.failed_reset_password)

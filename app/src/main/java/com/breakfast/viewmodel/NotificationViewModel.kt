@@ -69,10 +69,13 @@ class NotificationViewModel(private val repository: NotificationRepository) : Vi
     /**
      * Factory to create [NotificationViewModel] with required dependencies.
      */
-    class Factory(private val apiService: com.breakfast.network.ApiService) : ViewModelProvider.Factory {
+    class Factory(
+        private val apiService: com.breakfast.network.ApiService,
+        private val context: android.content.Context
+    ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(NotificationViewModel::class.java)) {
-                val repository = NotificationRepository(apiService)
+                val repository = NotificationRepository(apiService, context)
                 @Suppress("UNCHECKED_CAST")
                 return NotificationViewModel(repository) as T
             }

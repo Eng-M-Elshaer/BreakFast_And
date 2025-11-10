@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,7 +50,8 @@ fun AssignItemScreen(
 ) {
 
     val apiService = ApiClient.apiService
-    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(apiService))
+    val context = LocalContext.current
+    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(apiService, context))
     val usersState by viewModel.usersState.collectAsState()
     val assignState by viewModel.assignState.collectAsState()
     val selectedUserId = remember { mutableStateOf<Int?>(null) }

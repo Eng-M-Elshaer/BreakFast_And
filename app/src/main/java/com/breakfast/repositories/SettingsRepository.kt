@@ -1,5 +1,7 @@
 package com.breakfast.repositories
 
+import android.content.Context
+import com.breakfast.R
 import com.breakfast.models.ApiResponse
 import com.breakfast.models.VersionModel
 import com.breakfast.network.ApiService
@@ -14,7 +16,10 @@ import java.io.IOException
  * version information and the "About Us" content. Each method wraps network calls in a
  * [Result] so that loading, success and error states can be observed from the ViewModel.
  */
-class SettingsRepository(private val apiService: ApiService) {
+class SettingsRepository(
+    private val apiService: ApiService,
+    private val context: Context
+) {
 
     /**
      * Fetch the current version information. The backend may return multiple key/value
@@ -28,7 +33,7 @@ class SettingsRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -45,7 +50,7 @@ class SettingsRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }

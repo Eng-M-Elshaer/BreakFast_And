@@ -86,11 +86,12 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
      */
     class Factory(
         private val preferenceManager: PreferenceManager,
-        private val apiService: com.breakfast.network.ApiService
+        private val apiService: com.breakfast.network.ApiService,
+        private val context: android.content.Context
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
-                val repository = ProfileRepository(apiService, preferenceManager)
+                val repository = ProfileRepository(apiService, preferenceManager, context)
                 @Suppress("UNCHECKED_CAST")
                 return ProfileViewModel(repository) as T
             }

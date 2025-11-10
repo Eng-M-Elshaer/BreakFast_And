@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -47,7 +48,8 @@ fun VerifyScreen(email: String, navController: NavController) {
     val codeState = remember { mutableStateOf("") }
     val preferenceManager = BreakfastApplication.get().preferenceManager
     val apiService = remember { ApiClient.apiService }
-    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService))
+    val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService, context))
     val verifyState = viewModel.verifyCodeState.collectAsState(null)
     val defaultFailed = stringResource(id = com.breakfast.R.string.failed_verify_code)
     val showError = remember { mutableStateOf(false) }

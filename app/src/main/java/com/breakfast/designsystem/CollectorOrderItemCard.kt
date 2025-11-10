@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.breakfast.R
-import com.breakfast.models.OrderHistoryItemModel
 
 interface CollectorOrderDisplayItem {
     val displayName: String?
@@ -34,20 +33,13 @@ interface CollectorOrderDisplayItem {
     val displayUsers: List<com.breakfast.models.Collector>?
 }
 
-data class HistoryItemAdapter(private val src: com.breakfast.models.OrderHistoryItemModel) : CollectorOrderDisplayItem {
-    override val displayName: String? get() = src.itemName
-    override val displayQuantity: Int? get() = src.quantity
-    override val displayPrice: Double? get() = src.price
-    override val displayTotal: Double? get() = src.totalPrice
-    override val displayNote: String? get() = src.note
-    override val displayUsers: List<com.breakfast.models.Collector>? get() = src.users
-}
-
 @Composable
 fun CollectorOrderItemCard(
     item: CollectorOrderDisplayItem,
-    onShowUsers: (List<com.breakfast.models.Collector>) -> Unit,
-    showInfoAction: Boolean = true
+    onShowUsers: ((List<com.breakfast.models.Collector>) -> Unit)? = null,
+    onDeleteItem: ((CollectorOrderDisplayItem) -> Unit)? = null,
+    showInfoAction: Boolean = true,
+    showDeleteAction: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -72,23 +64,33 @@ fun CollectorOrderItemCard(
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "${item.displayPrice ?: 0.0} EGP",
+                text = "${item.displayPrice ?: 0.0} ${stringResource(com.breakfast.R.string.currency)}",
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "${item.displayTotal ?: 0.0} EGP",
+                text = "${item.displayTotal ?: 0.0} ${stringResource(com.breakfast.R.string.currency)}",
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f)
             )
             if (showInfoAction && !item.displayUsers.isNullOrEmpty()) {
-                IconButton(onClick = { onShowUsers(item.displayUsers ?: emptyList()) }) {
+                IconButton(onClick = { onShowUsers?.invoke(item.displayUsers ?: emptyList()) }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_info),
                         contentDescription = null,
                         tint = Color(0xFF0D5BFF),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            if (showDeleteAction) {
+                IconButton(onClick = { onDeleteItem?.invoke(item) }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.trash_fill),
+                        contentDescription = null,
+                        tint = colorResource(id = R.color.punch),
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -103,19 +105,6 @@ fun CollectorOrderItemCard(
             )
         }
     }
-}
-
-@Composable
-fun CollectorOrderItemCard(
-    item: com.breakfast.models.OrderHistoryItemModel,
-    onShowUsers: (List<com.breakfast.models.Collector>) -> Unit,
-    showInfoAction: Boolean = true
-) {
-    CollectorOrderItemCard(
-        item = HistoryItemAdapter(item),
-        onShowUsers = onShowUsers,
-        showInfoAction = showInfoAction
-    )
 }
 
 @Preview(showBackground = true)
@@ -134,4 +123,14 @@ private fun CollectorOrderItemCardPreview() {
         onShowUsers = {},
         showInfoAction = false
     )
+}
+
+
+data class HistoryItemAdapter(private val src: com.breakfast.models.OrderHistoryItemModel) : CollectorOrderDisplayItem {
+    override val displayName: String? get() = src.itemName
+    override val displayQuantity: Int? get() = src.quantity
+    override val displayPrice: Double? get() = src.price
+    override val displayTotal: Double? get() = src.totalPrice
+    override val displayNote: String? get() = src.note
+    override val displayUsers: List<com.breakfast.models.Collector>? get() = src.users
 }

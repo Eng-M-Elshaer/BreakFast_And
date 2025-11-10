@@ -8,10 +8,8 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.io.IOException
 
-/**
- * Singleton object to provide a configured Retrofit service.
- */
 object ApiClient {
     private const val BASE_URL = "https://breakfast.restart-technology.com/api/"
 
@@ -23,6 +21,13 @@ object ApiClient {
     // Language provider to supply the current "Accept-Language" header. When null,
     // the header will be omitted and the backend will rely on server defaults.
     private var languageProvider: (() -> String?)? = null
+
+    // Optional network checker. Should return true if internet is available.
+    private var networkChecker: (() -> Boolean)? = null
+
+    fun setNetworkChecker(checker: () -> Boolean) {
+        networkChecker = checker
+    }
 
     /**
      * Set a callback that returns the latest auth token. Typically you will call this from
@@ -42,6 +47,10 @@ object ApiClient {
     }
 
     private val authInterceptor = Interceptor { chain ->
+        val hasNetwork = networkChecker?.invoke() ?: true
+        if (!hasNetwork) {
+            throw IOException("No internet connection")
+        }
         val original = chain.request()
         val requestBuilder = original.newBuilder()
             .header("Accept", "application/json")

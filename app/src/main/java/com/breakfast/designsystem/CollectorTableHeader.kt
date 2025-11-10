@@ -14,11 +14,16 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.breakfast.R
 
 
 @Composable
 fun CollectorTableHeader(showAction: Boolean = false) {
+    val fontColor = Color.White
+    val backgroundColor = colorResource(id = com.breakfast.R.color.blue_ribbon)
+    val fontSize = 12.sp
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -31,31 +36,36 @@ fun CollectorTableHeader(showAction: Boolean = false) {
     ) {
         Text(
             text = stringResource(id = R.string.name),
-            color = Color.White,
+            fontSize = fontSize,
+            color = fontColor,
             modifier = Modifier.weight(1.5f)
         )
         Text(
             text = stringResource(id = R.string.quantity),
-            color = Color.White,
+            fontSize = fontSize,
+            color = fontColor,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
         Text(
             text = stringResource(id = R.string.price),
-            color = Color.White,
+            fontSize = fontSize,
+            color = fontColor,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
         Text(
-            text = stringResource(id = R.string.total_price),
-            color = Color.White,
+            text = stringResource(id = R.string.total),
+            fontSize = fontSize,
+            color = fontColor,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
         if (showAction) {
             Text(
                 text = stringResource(id = R.string.action),
-                color = Color.White,
+                fontSize = fontSize,
+                color = fontColor,
                 modifier = Modifier.weight(0.8f),
                 textAlign = TextAlign.Center
             )

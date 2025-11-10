@@ -77,11 +77,12 @@ class SettingsViewModel(
      */
     class Factory(
         private val preferenceManager: PreferenceManager,
-        private val apiService: ApiService
+        private val apiService: ApiService,
+        private val context: android.content.Context
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
-                val repository = SettingsRepository(apiService)
+                val repository = SettingsRepository(apiService, context)
                 @Suppress("UNCHECKED_CAST")
                 return SettingsViewModel(repository, preferenceManager) as T
             }

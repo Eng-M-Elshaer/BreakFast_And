@@ -26,24 +26,27 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.breakfast.designsystem.OrderCard
+import com.breakfast.ui.components.BreakfastEmptyState
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(navController: NavController? = null) {
 
     val apiService = ApiClient.apiService
-    val viewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory(apiService))
+    val context = LocalContext.current
+    val viewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory(apiService, context))
     val historyState = viewModel.historyState.collectAsState(null)
 
     LaunchedEffect(Unit) {
         viewModel.fetchHistory()
     }
 
-    Scaffold(
-    ) { paddingValues ->
+    Scaffold() { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).padding(16.dp)) {
             Text(
                 text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.history),
@@ -65,32 +68,29 @@ fun HistoryScreen(navController: NavController? = null) {
                     }
                 }
                 is Result.Error -> {
-                    Text(text = state.message ?: androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.failed_load_history))
+                    BreakfastEmptyState(
+                        iconRes = com.breakfast.R.drawable.no_internet,
+                        title = state.message ?: stringResource(id = com.breakfast.R.string.failed_load_history),
+                        showButton = true,
+                        buttonText = stringResource(id = com.breakfast.R.string.retry),
+                        onButtonClick = { viewModel.fetchHistory() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(12.dp))
                 }
                 is Result.Success -> {
                     val itemsList = state.data.data ?: emptyList()
 
                     if (itemsList.isEmpty()) {
-                        Box(
+                        BreakfastEmptyState(
+                            iconRes = com.breakfast.R.drawable.no_history,
+                            title = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_history),
                             modifier = Modifier
                                 .weight(1f)
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Image(
-                                    painter = painterResource(id = com.breakfast.R.drawable.no_history),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(220.dp)
-                                )
-                                Spacer(Modifier.height(8.dp))
-                                Text(
-                                    text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_history),
-                                    style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
+                                .fillMaxWidth()
+                        )
                     } else {
                         LazyColumn {
                             items(itemsList) { item ->
@@ -118,9 +118,7 @@ fun HistoryScreen(navController: NavController? = null) {
                         }
                     }
                 }
-                else -> {
-                    // initial state
-                }
+                else -> {}
             }
         }
     }
@@ -130,31 +128,15 @@ fun HistoryScreen(navController: NavController? = null) {
 @Composable
 private fun HistoryEmptyPreview() {
     androidx.compose.material3.Scaffold(
-
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).padding(16.dp)) {
-
-
-            Box(
+            BreakfastEmptyState(
+                iconRes = com.breakfast.R.drawable.no_history,
+                title = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_history),
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(
-                        painter = painterResource(id = com.breakfast.R.drawable.no_history),
-                        contentDescription = null,
-                        modifier = Modifier.size(220.dp)
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_history),
-                        style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+                    .fillMaxWidth()
+            )
         }
     }
 }

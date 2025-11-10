@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,13 +41,15 @@ import com.breakfast.designsystem.OrderCard
 import androidx.navigation.NavController
 import com.breakfast.R
 import com.breakfast.models.NotificationSubjectType
+import com.breakfast.ui.components.BreakfastEmptyState
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationScreen(navController: NavController) {
 
     val apiService = ApiClient.apiService
-    val viewModel: NotificationViewModel = viewModel(factory = NotificationViewModel.Factory(apiService))
+    val context = LocalContext.current
+    val viewModel: NotificationViewModel = viewModel(factory = NotificationViewModel.Factory(apiService, context))
     val notificationsState = viewModel.notificationsState.collectAsState(null)
     val markState = viewModel.markState.collectAsState(null)
     val defaultLoadFailed = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.failed_load_notifications)
@@ -58,7 +61,6 @@ fun NotificationScreen(navController: NavController) {
         val s = notificationsState.value
         if (s is Result.Error) {
             errorMsg.value = s.message ?: defaultLoadFailed
-            showError.value = true
         }
     }
     LaunchedEffect(markState.value) {
@@ -126,31 +128,29 @@ fun NotificationScreen(navController: NavController) {
                         CircularProgressIndicator()
                     }
                 }
-                is Result.Error -> { /* Error shown via dialog */ }
+                is Result.Error -> {
+                    BreakfastEmptyState(
+                        iconRes = R.drawable.no_internet,
+                        title = state.message ?: stringResource(id = R.string.failed_load_notifications),
+                        showButton = true,
+                        buttonText = stringResource(id = R.string.retry),
+                        onButtonClick = { viewModel.fetchNotifications() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                }
                 is Result.Success -> {
                     val itemsList = state.data.data ?: emptyList()
 
                     if (itemsList.isEmpty()) {
-                        Box(
+                        BreakfastEmptyState(
+                            iconRes = com.breakfast.R.drawable.no_notification,
+                            title = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_notifications),
                             modifier = Modifier
                                 .weight(1f)
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Image(
-                                    painter = painterResource(id = com.breakfast.R.drawable.no_notification),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(220.dp)
-                                )
-                                Spacer(Modifier.height(8.dp))
-                                Text(
-                                    text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_notifications),
-                                    style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
+                                .fillMaxWidth()
+                        )
                     } else {
                         LazyColumn {
                             items(itemsList) { notification ->
@@ -249,26 +249,13 @@ private fun NotificationsEmptyPreview() {
                         modifier = Modifier.padding(start = 6.dp))
                 }
             }
-            Box(
+            BreakfastEmptyState(
+                iconRes = com.breakfast.R.drawable.no_notification,
+                title = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_notifications),
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(
-                        painter = painterResource(id = com.breakfast.R.drawable.no_notification),
-                        contentDescription = null,
-                        modifier = Modifier.size(220.dp)
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_notifications),
-                        style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+                    .fillMaxWidth()
+            )
         }
     }
     // NotificationScreen(navController)  // previews don't navigate

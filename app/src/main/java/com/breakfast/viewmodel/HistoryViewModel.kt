@@ -48,10 +48,13 @@ class HistoryViewModel(private val repository: HistoryRepository) : ViewModel() 
     /**
      * Factory to create [HistoryViewModel] with required dependencies.
      */
-    class Factory(private val apiService: com.breakfast.network.ApiService) : ViewModelProvider.Factory {
+    class Factory(
+        private val apiService: com.breakfast.network.ApiService,
+        private val context: android.content.Context
+    ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(HistoryViewModel::class.java)) {
-                val repository = HistoryRepository(apiService)
+                val repository = HistoryRepository(apiService, context)
                 @Suppress("UNCHECKED_CAST")
                 return HistoryViewModel(repository) as T
             }

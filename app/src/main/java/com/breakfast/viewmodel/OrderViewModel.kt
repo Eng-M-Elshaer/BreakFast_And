@@ -234,13 +234,16 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
 
     /**
      * Factory to create [OrderViewModel] instances with the provided
-     * [ApiService]. This avoids boilerplate when instantiating the ViewModel
+     * [ApiService] and [Context]. This avoids boilerplate when instantiating the ViewModel
      * from composable functions.
      */
-    class Factory(private val apiService: ApiService) : ViewModelProvider.Factory {
+    class Factory(
+        private val apiService: ApiService,
+        private val context: android.content.Context
+    ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(OrderViewModel::class.java)) {
-                val repository = OrderRepository(apiService)
+                val repository = OrderRepository(apiService, context)
                 @Suppress("UNCHECKED_CAST")
                 return OrderViewModel(repository) as T
             }

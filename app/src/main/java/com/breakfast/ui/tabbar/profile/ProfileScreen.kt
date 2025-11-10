@@ -62,6 +62,7 @@ import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import com.breakfast.ui.components.BreakfastEmptyState
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -70,13 +71,13 @@ fun ProfileScreen(navController: NavController? = null, isPreview: Boolean = fal
     // Obtain dependencies
     val preferenceManager = BreakfastApplication.get().preferenceManager
     val apiService = ApiClient.apiService
-    val viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(preferenceManager, apiService))
+    val context = LocalContext.current
+    val viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(preferenceManager, apiService, context))
     val profileState = viewModel.profileState.collectAsState(null)
     val updateState = viewModel.updateState.collectAsState(null)
     val logoutState = viewModel.logoutState.collectAsState(null)
     val showLogoutError = remember { mutableStateOf(false) }
     val logoutErrorMsg = remember { mutableStateOf("") }
-    val context = LocalContext.current
     val avatarState = viewModel.avatarState.collectAsState(null)
     val showAvatarError = remember { mutableStateOf(false) }
     val avatarErrorMsg = remember { mutableStateOf("") }
@@ -174,7 +175,16 @@ fun ProfileScreen(navController: NavController? = null, isPreview: Boolean = fal
                     }
                 }
                 is Result.Error -> {
-                    Text(text = state.message ?: androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.failed_load_profile))
+                    BreakfastEmptyState(
+                        iconRes = com.breakfast.R.drawable.no_internet,
+                        title = state.message ?: stringResource(id = com.breakfast.R.string.something_went_wrong),
+                        showButton = true,
+                        buttonText = stringResource(id = com.breakfast.R.string.retry),
+                        onButtonClick = { viewModel.loadProfile() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
                 }
                 is Result.Success<*> -> {
                     val user: User = when (val payload = state.data) {

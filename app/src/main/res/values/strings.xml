@@ -221,5 +221,6 @@
     <string name="list_item_line">List Item Line</string>
     <string name="receipt_loaded">Receipt Loaded</string>
     <string name="receipt">Receipt</string>
+    <string name="currency">EGP</string>
 
 </resources>

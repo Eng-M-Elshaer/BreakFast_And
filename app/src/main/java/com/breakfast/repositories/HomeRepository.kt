@@ -1,5 +1,7 @@
 package com.breakfast.repositories
 
+import android.content.Context
+import com.breakfast.R
 import com.breakfast.models.ApiResponse
 import com.breakfast.models.HomeModel
 import com.breakfast.models.StoreModel
@@ -14,7 +16,10 @@ import com.breakfast.network.StartOrderRequest
 /**
  * Repository to fetch data for the Home screen, such as current orders or stores list.
  */
-class HomeRepository(private val apiService: ApiService) {
+class HomeRepository(
+    private val apiService: ApiService,
+    private val context: Context
+) {
     suspend fun getHome(): Result<ApiResponse<List<HomeModel>>> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.home()
@@ -22,7 +27,7 @@ class HomeRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -35,7 +40,7 @@ class HomeRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -48,7 +53,7 @@ class HomeRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -61,7 +66,7 @@ class HomeRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }

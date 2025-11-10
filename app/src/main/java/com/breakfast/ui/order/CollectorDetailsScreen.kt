@@ -39,7 +39,9 @@ import com.breakfast.viewmodel.OrderViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import com.breakfast.ui.components.BreakfastEmptyState
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +52,7 @@ import androidx.navigation.NavController
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
 import com.breakfast.designsystem.BreakfastOutlinedTextField
+import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.models.CustomItemPayload
 import com.breakfast.designsystem.CollectorOrderItemCard
 
@@ -63,7 +66,8 @@ import com.breakfast.designsystem.CollectorOrderItemCard
 fun CollectorDetailsScreen(
     navController: NavController? = null,
 ) {
-    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(ApiClient.apiService))
+    val context = LocalContext.current
+    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(ApiClient.apiService, context))
     val collectorState by viewModel.collectorState.collectAsState()
     val stopState by viewModel.stopState.collectAsState()
     val closeState by viewModel.closeState.collectAsState()
@@ -163,6 +167,7 @@ fun CollectorDetailsScreen(
             selectedUsers = selectedUsers.value,
             collectorTaxError = taxError.value,
             collectorDeliveryError = deliveryError.value,
+            onRetry = { viewModel.fetchCollectorItems() },
             modifier = Modifier
                 .padding(paddingValues)
                 .padding(16.dp)
@@ -190,6 +195,7 @@ private fun CollectorDetailsContent(
     onDismissUsers: () -> Unit,
     showUsersDialog: Boolean,
     selectedUsers: List<com.breakfast.models.Collector>,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -203,7 +209,16 @@ private fun CollectorDetailsContent(
                 CircularProgressIndicator()
             }
             is Result.Error -> {
-                Text(text = s.message ?: androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.failed_load_collector))
+                BreakfastEmptyState(
+                    iconRes = R.drawable.no_internet,
+                    title = s.message ?: stringResource(id = R.string.failed_load_collector),
+                    showButton = true,
+                    buttonText = stringResource(id = R.string.retry),
+                    onButtonClick = onRetry,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(280.dp)
+                )
             }
             is Result.Success -> {
                 val data = s.data.data
@@ -307,7 +322,7 @@ private fun CollectorDetailsContent(
                                             .padding(horizontal = 12.dp, vertical = 6.dp)
                                     ) {
                                         CollectorOrderItemCard(
-                                            item = item,
+                                            item = OrderHistoryItemDisplayAdapter(item),
                                             onShowUsers = onShowUsers
                                         )
                                     }
@@ -582,6 +597,27 @@ private fun CollectorDetailsScreenPreview() {
         onDismissUsers = {},
         showUsersDialog = false,
         selectedUsers = emptyList(),
+        onRetry = {},
         modifier = Modifier.padding(16.dp)
     )
+}
+
+private data class OrderHistoryItemDisplayAdapter(
+    private val src: OrderHistoryItemModel
+) : CollectorOrderDisplayItem {
+
+    override val displayName: String? get() = src.itemName ?: src.note
+    override val displayQuantity: Int? get() = src.quantity
+    override val displayPrice: Double? get() = src.price
+    override val displayTotal: Double? get() = src.totalPrice
+    override val displayNote: String? get() = src.note
+    override val displayUsers: List<com.breakfast.models.Collector>? get() =
+        src.users?.mapNotNull { apiUser ->
+            val id = apiUser.id ?: return@mapNotNull null
+            com.breakfast.models.Collector(
+                id = id,
+                name = apiUser.name ?: "",
+                image = apiUser.image
+            )
+        }
 }

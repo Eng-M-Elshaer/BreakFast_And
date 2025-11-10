@@ -1,6 +1,5 @@
-import com.breakfast.ui.order.OrderInfoCard
 
-import androidx.compose.foundation.Image
+import com.breakfast.ui.order.OrderInfoCard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,14 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -37,13 +34,11 @@ import com.breakfast.viewmodel.HistoryViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
@@ -52,6 +47,7 @@ import com.breakfast.designsystem.CollectorOrderItemCard
 import com.breakfast.designsystem.CollectorTableHeader
 import com.breakfast.designsystem.TabChip
 import com.breakfast.managers.PreferenceManager
+import com.breakfast.ui.components.BreakfastEmptyState
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -60,9 +56,9 @@ fun HistoryDetailScreen(
     navController: NavController? = null
 ) {
     val apiService = ApiClient.apiService
-    val viewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory(apiService))
-    val detailState by viewModel.detailState.collectAsState(null)
     val context = LocalContext.current
+    val viewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory(apiService, context))
+    val detailState by viewModel.detailState.collectAsState(null)
     val myId = remember { PreferenceManager(context).getUser()?.id }
 
     // Fetch order details when this screen is first displayed
@@ -98,33 +94,29 @@ fun HistoryDetailScreen(
                     }
                 }
                 is Result.Error -> {
-                    Text(text = state.message ?: androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.failed_load_order_detail))
+                    BreakfastEmptyState(
+                        iconRes = com.breakfast.R.drawable.no_internet,
+                        title = state.message ?: stringResource(id = com.breakfast.R.string.failed_load_order_detail),
+                        showButton = true,
+                        buttonText = stringResource(id = com.breakfast.R.string.retry),
+                        onButtonClick = { viewModel.fetchHistoryDetail(orderId) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
                 }
                 is Result.Success -> {
                     val detail = state.data.data
                     val items = detail?.orderItems ?: emptyList()
 
                     if (items.isEmpty()) {
-                        Box(
+                        BreakfastEmptyState(
+                            iconRes = com.breakfast.R.drawable.no_orders,
+                            title = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_items_in_order),
                             modifier = Modifier
                                 .weight(1f)
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Image(
-                                    painter = painterResource(id = com.breakfast.R.drawable.no_orders),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(220.dp)
-                                )
-                                Spacer(Modifier.height(8.dp))
-                                Text(
-                                    text = stringResource(id = com.breakfast.R.string.no_items_in_order),
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
+                                .fillMaxWidth()
+                        )
                     } else {
                         // toggle row (Table / List)
                         Row(

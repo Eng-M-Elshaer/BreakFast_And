@@ -1,5 +1,7 @@
 package com.breakfast.repositories
 
+import android.content.Context
+import com.breakfast.R
 import com.breakfast.managers.PreferenceManager
 import com.breakfast.models.ApiResponse
 import com.breakfast.models.UserModel
@@ -16,7 +18,11 @@ import java.io.IOException
  * Repository that handles authentication related operations. It encapsulates the network calls
  * and stores the received token and user data in the [PreferenceManager].
  */
-class AuthRepository(private val apiService: ApiService, private val preferenceManager: PreferenceManager) {
+class AuthRepository(
+    private val apiService: ApiService,
+    private val preferenceManager: PreferenceManager,
+    private val context: Context
+) {
 
     /**
      * Perform user login. This method makes a network request using the provided credentials.
@@ -33,7 +39,7 @@ class AuthRepository(private val apiService: ApiService, private val preferenceM
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -51,7 +57,7 @@ class AuthRepository(private val apiService: ApiService, private val preferenceM
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -73,7 +79,7 @@ class AuthRepository(private val apiService: ApiService, private val preferenceM
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -89,7 +95,7 @@ class AuthRepository(private val apiService: ApiService, private val preferenceM
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -107,7 +113,7 @@ class AuthRepository(private val apiService: ApiService, private val preferenceM
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -130,7 +136,7 @@ class AuthRepository(private val apiService: ApiService, private val preferenceM
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }

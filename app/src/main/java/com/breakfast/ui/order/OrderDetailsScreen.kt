@@ -42,12 +42,14 @@ import com.breakfast.designsystem.BreakfastButtonRes
 import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.designsystem.CollectorOrderItemCard
 import com.breakfast.designsystem.CollectorTableHeader
+import com.breakfast.designsystem.TabChip
 import com.breakfast.models.ApiResponse
 import com.breakfast.models.CollectorHistoryModel
 import com.breakfast.models.OrderInfoModel
 import com.breakfast.models.OrderItem
 import com.breakfast.models.UsersItem
 import com.breakfast.network.ApiClient
+import com.breakfast.ui.components.BreakfastEmptyState
 import com.breakfast.utils.Result
 import com.breakfast.viewmodel.OrderViewModel
 
@@ -59,8 +61,10 @@ fun OrderDetailsScreen(
     previewData: CollectorHistoryModel? = null,
     onReopen: () -> Unit = {}
 ) {
+
+    val context = LocalContext.current
     val viewModel: OrderViewModel? = if (previewData == null) {
-        viewModel(factory = OrderViewModel.Factory(ApiClient.apiService))
+        viewModel(factory = OrderViewModel.Factory(ApiClient.apiService, context))
     } else {
         null
     }
@@ -206,9 +210,15 @@ fun OrderDetailsScreen(
                 }
 
                 is Result.Error -> {
-                    Text(
-                        text = state.message ?: stringResource(id = R.string.failed_load_order_items),
-                        color = MaterialTheme.colorScheme.error
+                    BreakfastEmptyState(
+                        iconRes = com.breakfast.R.drawable.no_internet,
+                        title = state.message ?: stringResource(id = com.breakfast.R.string.failed_load_order_items),
+                        showButton = true,
+                        buttonText = stringResource(id = com.breakfast.R.string.retry),
+                        onButtonClick = { viewModel?.fetchCollectorHistoryItems(orderId) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
                     )
                 }
 
@@ -362,29 +372,6 @@ fun OrderDetailsScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun TabChip(
-    text: String,
-    selected: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(999.dp))
-            .background(if (selected) Color(0xFF0F6BFF) else Color.Transparent)
-            .fillMaxHeight()
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = if (selected) Color.White else Color.Black,
-            fontWeight = FontWeight.SemiBold
-        )
     }
 }
 

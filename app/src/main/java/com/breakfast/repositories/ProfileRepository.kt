@@ -1,5 +1,7 @@
 package com.breakfast.repositories
 
+import android.content.Context
+import com.breakfast.R
 import com.breakfast.models.ApiResponse
 import com.breakfast.models.UserModel
 import com.breakfast.network.UpdateProfileRequest
@@ -10,13 +12,18 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import com.breakfast.managers.PreferenceManager
+import java.io.IOException
 
 /**
  * Repository for managing the user's profile. Handles fetching profile data,
  * updating account information and deleting the account. Interacts with
  * [PreferenceManager] to persist user changes locally.
  */
-class ProfileRepository(private val apiService: ApiService, private val preferenceManager: PreferenceManager) {
+class ProfileRepository(
+    private val apiService: ApiService,
+    private val preferenceManager: PreferenceManager,
+    private val context: Context
+) {
 
     /**
      * Retrieve the current user's profile from the backend. On success, updates the stored
@@ -30,6 +37,8 @@ class ProfileRepository(private val apiService: ApiService, private val preferen
             // Persist the token and user locally
             preferenceManager.saveUser(user)
             Result.Success(userModel)
+        } catch (e: IOException) {
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.message)
         }
@@ -46,6 +55,8 @@ class ProfileRepository(private val apiService: ApiService, private val preferen
             preferenceManager.saveUser(user)
             userModel.data.token?.let { preferenceManager.saveToken(it) }
             Result.Success(userModel)
+        } catch (e: IOException) {
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.message)
         }
@@ -61,6 +72,8 @@ class ProfileRepository(private val apiService: ApiService, private val preferen
             preferenceManager.clear()
             val user = userModel
             Result.Success(user)
+        } catch (e: IOException) {
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.message)
         }
@@ -83,6 +96,8 @@ class ProfileRepository(private val apiService: ApiService, private val preferen
             val userModel = apiService.uploadAvatar(part)
             val user = userModel.data ?: throw Exception("User data is missing")
             Result.Success(userModel)
+        } catch (e: IOException) {
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.message)
         }

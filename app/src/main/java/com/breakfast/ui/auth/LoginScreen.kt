@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,7 +57,8 @@ fun LoginScreen(navController: NavController, onSignUp: () -> Unit = {}) {
     val password = remember { mutableStateOf("") }
     val preferenceManager = BreakfastApplication.get().preferenceManager
     val apiService = remember { ApiClient.apiService }
-    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService))
+    val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService, context))
     val loginState = viewModel.loginState.collectAsState(null)
     val state = loginState.value
     val showError = remember { mutableStateOf(false) }

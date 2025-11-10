@@ -207,11 +207,12 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
  */
 class AuthViewModelFactory(
     private val preferenceManager: PreferenceManager,
-    private val apiService: com.breakfast.network.ApiService
+    private val apiService: com.breakfast.network.ApiService,
+    private val context: android.content.Context
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
-            val repository = AuthRepository(apiService, preferenceManager)
+            val repository = AuthRepository(apiService, preferenceManager, context)
             @Suppress("UNCHECKED_CAST")
             return AuthViewModel(repository) as T
         }

@@ -66,12 +66,15 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
     }
 
     /**
-     * Factory to create [HomeViewModel] with the provided [ApiService].
+     * Factory to create [HomeViewModel] with the provided [ApiService] and [Context].
      */
-    class Factory(private val apiService: com.breakfast.network.ApiService) : androidx.lifecycle.ViewModelProvider.Factory {
+    class Factory(
+        private val apiService: com.breakfast.network.ApiService,
+        private val context: android.content.Context
+    ) : androidx.lifecycle.ViewModelProvider.Factory {
         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-                val repository = HomeRepository(apiService)
+                val repository = HomeRepository(apiService, context)
                 @Suppress("UNCHECKED_CAST")
                 return HomeViewModel(repository) as T
             }

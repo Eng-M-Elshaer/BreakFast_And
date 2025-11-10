@@ -1,5 +1,7 @@
 package com.breakfast.repositories
 
+import android.content.Context
+import com.breakfast.R
 import com.breakfast.models.*
 import com.breakfast.network.ApiService
 import com.breakfast.models.PersonModel
@@ -20,7 +22,10 @@ import java.io.IOException
  * Each method wraps network calls in a [Result] to propagate loading,
  * success or error states back to the ViewModel layer.
  */
-class OrderRepository(private val apiService: ApiService) {
+class OrderRepository(
+    private val apiService: ApiService,
+    private val context: Context
+) {
 
     /**
      * Fetch the list of items in the current user's active order.
@@ -32,7 +37,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -60,7 +65,7 @@ class OrderRepository(private val apiService: ApiService) {
             } catch (e: HttpException) {
                 Result.Error(e.response()?.errorBody()?.string())
             } catch (e: IOException) {
-                Result.Error(e.message)
+                Result.Error(context.getString(R.string.no_internet))
             } catch (e: Exception) {
                 Result.Error(e.localizedMessage)
             }
@@ -93,7 +98,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -117,7 +122,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -134,7 +139,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -151,7 +156,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -163,7 +168,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -179,7 +184,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -191,7 +196,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -203,7 +208,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -225,7 +230,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -242,7 +247,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }
@@ -270,7 +275,7 @@ class OrderRepository(private val apiService: ApiService) {
         } catch (e: HttpException) {
             Result.Error(e.response()?.errorBody()?.string())
         } catch (e: IOException) {
-            Result.Error(e.message)
+            Result.Error(context.getString(R.string.no_internet))
         } catch (e: Exception) {
             Result.Error(e.localizedMessage)
         }

@@ -55,6 +55,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.MaterialTheme
 import com.breakfast.utils.Validator
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.breakfast.ui.components.ErrorDialog
 import com.breakfast.designsystem.BreakfastOutlinedTextField
@@ -70,7 +71,8 @@ fun SignUpScreen(navController: NavController, onSignUpSuccess: () -> Unit = {})
     val confirmPassword = remember { mutableStateOf("") }
     val preferenceManager = BreakfastApplication.get().preferenceManager
     val apiService = remember { ApiClient.apiService }
-    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService))
+    val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService, context))
     val registerState = viewModel.registerState.collectAsState(null)
     val defaultRegisterFailed = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.registration_failed)
     val showError = remember { mutableStateOf(false) }

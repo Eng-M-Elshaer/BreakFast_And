@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.ui.platform.LocalContext
 import com.breakfast.ui.components.ErrorDialog
 import androidx.compose.ui.res.stringResource
 
@@ -143,7 +144,8 @@ fun ForgotPasswordScreen(navController: NavController) {
     val email = remember { mutableStateOf("") }
     val preferenceManager = BreakfastApplication.get().preferenceManager
     val apiService = remember { ApiClient.apiService }
-    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService))
+    val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(preferenceManager, apiService, context))
     val sendState = viewModel.sendResetMailState.collectAsState(null)
     val defaultFailed = stringResource(id = com.breakfast.R.string.failed_send_reset)
     val showError = remember { mutableStateOf(false) }

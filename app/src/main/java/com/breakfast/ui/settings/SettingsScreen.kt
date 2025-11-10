@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -32,11 +33,11 @@ import com.breakfast.viewmodel.SettingsViewModel
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController? = null) {
-    val context = BreakfastApplication.get()
-    val preferenceManager = context.preferenceManager
-    val apiService = ApiClient.apiService
-    val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory(preferenceManager, apiService))
 
+    val context = LocalContext.current
+    val preferenceManager = BreakfastApplication.get().preferenceManager
+    val apiService = ApiClient.apiService
+    val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModel.Factory(preferenceManager, apiService, context))
     val versionState by viewModel.versionState.collectAsState()
     val aboutUsState by viewModel.aboutUsState.collectAsState()
     val language by viewModel.languageState.collectAsState()

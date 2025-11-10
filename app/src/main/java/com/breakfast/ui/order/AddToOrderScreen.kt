@@ -2,7 +2,6 @@
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,16 +10,11 @@ import androidx.compose.material3.*
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.breakfast.models.StoreItemModel
@@ -32,9 +26,210 @@ import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import com.breakfast.designsystem.BreakfastOutlinedTextField
 import androidx.compose.ui.text.input.KeyboardType
+import com.breakfast.designsystem.CollectorTableHeader
+import com.breakfast.designsystem.CollectorOrderItemCard
+import com.breakfast.designsystem.CollectorOrderDisplayItem
+import com.breakfast.models.OrderModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AddToOrderScreenContent(
+    itemsList: List<StoreItemModel>,
+    usersList: List<PersonModel>,
+    orderItems: List<OrderModel>,
+    onBack: () -> Unit = {},
+    onSubmit: (selectedItem: StoreItemModel, quantity: Int, note: String, selectedUser: PersonModel?) -> Unit = { _,_,_,_ -> },
+    onDeleteItem: (Int) -> Unit = {}
+) {
+    var selectedItem by remember { mutableStateOf<StoreItemModel?>(null) }
+    var isItemsExpanded by remember { mutableStateOf(false) }
+    var quantity by remember { mutableStateOf("1") }
+    var note by remember { mutableStateOf("") }
+    var selectedUser by remember { mutableStateOf<PersonModel?>(null) }
+    var isUsersExpanded by remember { mutableStateOf(false) }
+    // --- State for delete dialog ---
+    var itemToDeleteId by remember { mutableStateOf<Int?>(null) }
+    var showDelete by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(6.dp))
+        ExposedDropdownMenuBox(
+            expanded = isItemsExpanded,
+            onExpandedChange = { isItemsExpanded = !isItemsExpanded },
+        ) {
+            BreakfastOutlinedTextField(
+                value = if (selectedItem != null) "${selectedItem?.name} - ${selectedItem?.price} EGP" else "",
+                onValueChange = {},
+                label = stringResource(id = R.string.select_item),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                trailing = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isItemsExpanded)
+                }
+            )
+            ExposedDropdownMenu(
+                expanded = isItemsExpanded,
+                onDismissRequest = { isItemsExpanded = false }
+            ) {
+                itemsList.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text ="${item.name} - ${item.price} EGP") },
+                        onClick = {
+                            selectedItem = item
+                            isItemsExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(6.dp))
+        BreakfastOutlinedTextField(
+            value = quantity,
+            onValueChange = { value -> quantity = value.filter { it.isDigit() } },
+            label = stringResource(id = R.string.quantity),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(6.dp))
+        BreakfastOutlinedTextField(
+            value = note,
+            onValueChange = { note = it },
+            label = stringResource(id = R.string.add_note_optional),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(6.dp))
+        ExposedDropdownMenuBox(
+            expanded = isUsersExpanded,
+            onExpandedChange = { isUsersExpanded = !isUsersExpanded },
+        ) {
+            BreakfastOutlinedTextField(
+                value = selectedUser?.name ?: "",
+                onValueChange = {},
+                label = stringResource(id = R.string.order_for_others),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                trailing = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isUsersExpanded)
+                }
+            )
+            ExposedDropdownMenu(
+                expanded = isUsersExpanded,
+                onDismissRequest = { isUsersExpanded = false }
+            ) {
+                usersList.forEach { user ->
+                    DropdownMenuItem(
+                        text = { Text(text = user.name ?: user.email ?: "") },
+                        onClick = {
+                            selectedUser = user
+                            isUsersExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        val isManualItem = (selectedItem?.id ?: -1) == 0
+        val isFormValid = selectedItem != null && quantity.isNotBlank() && !(isManualItem && note.isBlank())
+
+        BreakfastButtonRes(
+            onClick = {
+                val item = selectedItem ?: return@BreakfastButtonRes
+                if ((item.id ?: -1) == 0 && note.isBlank()) {
+                    return@BreakfastButtonRes
+                }
+                val qtyInt = quantity.toIntOrNull() ?: 1
+                onSubmit(item, qtyInt, note, selectedUser)
+            },
+            enabled = isFormValid,
+            isHasObserver = !isFormValid,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            iconRes = com.breakfast.R.drawable.plus_square_fill
+        ) {
+            Text(text = stringResource(id = R.string.submit))
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(text = stringResource(id = R.string.added_items), fontWeight = FontWeight.SemiBold)
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            CollectorTableHeader(showAction = true)
+
+            orderItems.forEachIndexed { index, item ->
+                val isLast = index == orderItems.lastIndex
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = colorResource(id = com.breakfast.R.color.background_grey),
+                            shape = if (isLast) RoundedCornerShape(
+                                bottomStart = 24.dp,
+                                bottomEnd = 24.dp
+                            ) else RoundedCornerShape(0.dp)
+                        )
+                        .padding(horizontal = 4.dp, vertical = 6.dp)
+                ) {
+                    CollectorOrderItemCard(
+                        item = AddOrderItemDisplayAdapter(item),
+                        showDeleteAction = true,
+                        onDeleteItem = {
+                            val id = item.id
+                            if (id != null) {
+                                itemToDeleteId = id
+                                showDelete = true
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        if (showDelete && itemToDeleteId != null) {
+            AlertDialog(
+                onDismissRequest = { showDelete = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val targetId = itemToDeleteId
+                        showDelete = false
+                        if (targetId != null) {
+                            onDeleteItem(targetId)
+                        }
+                    }) {
+                        Text(text = stringResource(id = R.string.yes))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDelete = false }) {
+                        Text(text = stringResource(id = R.string.cancel))
+                    }
+                },
+                title = { Text(text = stringResource(id = R.string.delete)) },
+                text = { Text(text = stringResource(id = R.string.are_you_sure_delete_item)) }
+            )
+        }
+    }
+}
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 /**
@@ -55,19 +250,14 @@ fun AddToOrderScreen(
     onItemAdded: () -> Unit = {}
 ) {
     // Obtain a ViewModel scoped to this screen. A factory is used to inject ApiService.
-    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(ApiClient.apiService))
+    val context = LocalContext.current
+    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(ApiClient.apiService, context))
     // Observe state flows from the ViewModel.
     val storeItemsState by viewModel.storeItemsState.collectAsState()
     val usersState by viewModel.usersState.collectAsState()
     val addItemState by viewModel.addItemState.collectAsState()
     val orderItemsState by viewModel.orderItemsState.collectAsState()
     val deleteItemState by viewModel.deleteItemState.collectAsState()
-    var selectedItem by remember { mutableStateOf<StoreItemModel?>(null) }
-    var isItemsExpanded by remember { mutableStateOf(false) }
-    var quantity by remember { mutableStateOf("1") }
-    var note by remember { mutableStateOf("") }
-    var selectedUser by remember { mutableStateOf<PersonModel?>(null) }
-    var isUsersExpanded by remember { mutableStateOf(false) }
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     // Trigger loading of store items when the composable first enters the composition.
@@ -80,11 +270,6 @@ fun AddToOrderScreen(
             // reload order items so the table shows the new one
             orderId?.let { viewModel.fetchOrderItems(orderId) }
 
-            // clear form for better UX
-            selectedItem = null
-            quantity = "1"
-            note = ""
-            selectedUser = null
         }
     }
     // If an item was successfully deleted, reload order items
@@ -99,10 +284,18 @@ fun AddToOrderScreen(
         orderId?.let { viewModel.fetchOrderItems(orderId) }
     }
 
-    // --- State for delete dialog ---
-    var itemToDeleteId by remember { mutableStateOf<Int?>(null) }
-    var showDelete by remember { mutableStateOf(false) }
-
+    val itemsList: List<StoreItemModel> = when (val state = storeItemsState) {
+        is Result.Success -> state.data.data ?: emptyList()
+        else -> emptyList()
+    }
+    val usersList: List<PersonModel> = when (val u = usersState) {
+        is Result.Success -> u.data.data ?: emptyList()
+        else -> emptyList()
+    }
+    val orderItems: List<OrderModel> = when (val s = orderItemsState) {
+        is Result.Success -> s.data.data ?: emptyList()
+        else -> emptyList()
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -120,304 +313,33 @@ fun AddToOrderScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            // 1. Items dropdown (Select Item)
-            Text(text = stringResource(id = R.string.select_item), fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(6.dp))
-            val itemsList: List<StoreItemModel> = when (val state = storeItemsState) {
-                is Result.Success -> state.data.data ?: emptyList()
-                else -> emptyList()
-            }
-            ExposedDropdownMenuBox(
-                expanded = isItemsExpanded,
-                onExpandedChange = { isItemsExpanded = !isItemsExpanded },
-            ) {
-                OutlinedTextField(
-                    value = "${selectedItem?.name} - ${selectedItem?.price} EGP",
-                    onValueChange = {},
-                    readOnly = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                    shape = RoundedCornerShape(20.dp),
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isItemsExpanded) }
-                )
-                ExposedDropdownMenu(
-                    expanded = isItemsExpanded,
-                    onDismissRequest = { isItemsExpanded = false }
-                ) {
-                    itemsList.forEach { item ->
-                        DropdownMenuItem(
-                            text = { Text(text ="${item.name} - ${item.price} EGP") },
-                            onClick = {
-                                selectedItem = item
-                                isItemsExpanded = false
-                            }
-                        )
+        Box(modifier = Modifier.padding(paddingValues)) {
+            AddToOrderScreenContent(
+                itemsList = itemsList,
+                usersList = usersList,
+                orderItems = orderItems,
+                onBack = {
+                    val popped = navController?.popBackStack() ?: false
+                    if (!popped) {
+                        backDispatcher?.onBackPressed()
                     }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 2. Quantity
-            Text(text = stringResource(id = R.string.quantity), fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(6.dp))
-            BreakfastOutlinedTextField(
-                value = quantity,
-                onValueChange = { value -> quantity = value.filter { it.isDigit() } },
-                label = stringResource(id = R.string.quantity),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 3. Note (optional)
-            Text(text = stringResource(id = R.string.add_note_optional), fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(6.dp))
-            BreakfastOutlinedTextField(
-                value = note,
-                onValueChange = { note = it },
-                label = stringResource(id = R.string.add_note_optional),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 4. Order for others (users dropdown)
-            Text(text = stringResource(id = R.string.order_for_others), fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(6.dp))
-            val usersList: List<PersonModel> = when (val u = usersState) {
-                is Result.Success -> u.data.data ?: emptyList()
-                else -> emptyList()
-            }
-            ExposedDropdownMenuBox(
-                expanded = isUsersExpanded,
-                onExpandedChange = { isUsersExpanded = !isUsersExpanded },
-            ) {
-                OutlinedTextField(
-                    value = selectedUser?.name ?: "",
-                    onValueChange = {},
-                    readOnly = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                    shape = RoundedCornerShape(20.dp),
-                    placeholder = { Text(text = stringResource(id = R.string.name)) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isUsersExpanded) }
-                )
-                ExposedDropdownMenu(
-                    expanded = isUsersExpanded,
-                    onDismissRequest = { isUsersExpanded = false }
-                ) {
-                    usersList.forEach { user ->
-                        DropdownMenuItem(
-                            text = { Text(text = user.name ?: user.email ?: "") },
-                            onClick = {
-                                selectedUser = user
-                                isUsersExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // 5. Submit button (Breakfast)
-            val isManualItem = (selectedItem?.id ?: -1) == 0
-            val isFormValid = selectedItem != null && quantity.isNotBlank() && !(isManualItem && note.isBlank())
-
-            BreakfastButtonRes(
-                onClick = {
-                    val item = selectedItem ?: return@BreakfastButtonRes
-                    // if it's the manual/custom item (id == 0) and note is empty, do nothing
-                    if ((item.id ?: -1) == 0 && note.isBlank()) {
-                        return@BreakfastButtonRes
-                    }
-                    val itemId = item.id ?: 0
-                    val qtyInt = quantity.toIntOrNull() ?: 1
+                },
+                onSubmit = { selectedItem, quantity, note, selectedUser ->
+                    val itemId = selectedItem.id ?: 0
                     viewModel.addItem(
                         orderId = orderId,
                         itemId = if (itemId == 0) null else itemId,
-                        quantity = qtyInt,
-                        price = item.price,
+                        quantity = quantity,
+                        price = selectedItem.price,
                         note = if (note.isBlank()) "" else note,
                         userId = selectedUser?.id
                     )
                 },
-                enabled = isFormValid,
-                isHasObserver = !isFormValid,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                iconRes = com.breakfast.R.drawable.plus_square_fill
-            ) {
-                Text(text = stringResource(id = R.string.submit))
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // 6. Table of added items
-            Text(text = stringResource(id = R.string.added_items), fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(10.dp))
-            val orderItems = when (val s = orderItemsState) {
-                is Result.Success -> s.data.data ?: emptyList()
-                else -> emptyList()
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color.White)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFF0066FF))
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.name),
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 4.dp)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.quantity),
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.price),
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.total),
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.action),
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 4.dp)
-                    )
+                onDeleteItem = { itemId ->
+                    viewModel.removeOrderItem(itemId)
+                    orderId?.let { viewModel.fetchOrderItems(it) }
                 }
-                orderItems.forEach { item ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 8.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFFF7F7F7))
-                            .padding(horizontal = 12.dp, vertical = 14.dp),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = item.itemName ?: item.note ?: "",
-                                fontSize = 12.sp,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Text(
-                                text = (item.quantity ?: 0).toString(),
-                                fontSize = 12.sp,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(horizontal = 4.dp),
-                                textAlign = TextAlign.Center
-                            )
-                            Text(
-                                text = "${item.price ?: 0.0} EGP",
-                                fontSize = 12.sp,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(horizontal = 4.dp),
-                                textAlign = TextAlign.Center
-                            )
-                            Text(
-                                text = "${item.total ?: 0.0} EGP",
-                                fontSize = 12.sp,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = 4.dp),
-                                textAlign = TextAlign.Center
-                            )
-                            Text(
-                                text = "\uD83D\uDDD1",
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable {
-                                        val id = item.id
-                                        if (id != null) {
-                                            itemToDeleteId = id
-                                            showDelete = true
-                                        }
-                                    },
-                                textAlign = TextAlign.Center,
-                                color = Color.Red
-                            )
-                        }
-                        if (!item.note.isNullOrBlank() && !item.itemName.isNullOrBlank()) {
-                            Text(
-                                text = stringResource(com.breakfast.R.string.note) + ": " + item.note,
-                                fontSize = 12.sp,
-                                color = colorResource(id = R.color.punch),
-                                modifier = Modifier.padding(top = 6.dp, start = 4.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // --- Confirm Delete Dialog ---
-            if (showDelete && itemToDeleteId != null) {
-                AlertDialog(
-                    onDismissRequest = { showDelete = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            val targetId = itemToDeleteId
-                            showDelete = false
-                            if (targetId != null) {
-                                viewModel.removeOrderItem(targetId)
-                                orderId?.let { viewModel.fetchOrderItems(it) }
-                            }
-                        }) {
-                            Text(text = stringResource(id = R.string.yes))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDelete = false }) {
-                            Text(text = stringResource(id = R.string.cancel))
-                        }
-                    },
-                    title = { Text(text = stringResource(id = R.string.delete)) },
-                    text = { Text(text = stringResource(id = R.string.are_you_sure_delete_item)) }
-                )
-            }
+            )
         }
     }
 }
@@ -426,164 +348,23 @@ fun AddToOrderScreen(
 @Composable
 private fun AddToOrderScreenPreview() {
     MaterialTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            // top part mock
-            Text(text = "Select Item", fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
-                value = "Foul Sandwich",
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp)
+        AddToOrderScreenContent(
+            itemsList = listOf(StoreItemModel(id=1, name="Foul Sandwich", price=20.0)),
+            usersList = emptyList(),
+            orderItems = listOf(
+                OrderModel(id=1, orderID=10, itemName="Foul Sandwich", quantity=2, price=20.0, total=40.0, note="no onions", other = null)
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Quantity", fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(6.dp))
-            BreakfastOutlinedTextField(
-                value = "2",
-                onValueChange = {},
-                label = "Quantity",
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Added Items", fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(10.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color.White)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFF0066FF))
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "Name", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 4.dp))
-                    Text(text = "Quantity", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                    Text(text = "Price", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                    Text(text = "Total", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                    Text(text = "Action", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 4.dp), textAlign = TextAlign.End)
-                }
-                val mock = listOf(
-                    Triple("Foul Sandwich", 2, 20.0),
-                    Triple("Tea", 1, 5.0)
-                )
-                mock.forEach { (name, qty, price) ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 8.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFFF7F7F7))
-                            .padding(horizontal = 12.dp, vertical = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = name, fontSize = 12.sp, modifier = Modifier.weight(1f))
-                        Text(text = qty.toString(), fontSize = 12.sp, modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                        Text(text = "$price EGP", fontSize = 12.sp, modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                        Text(text = "${price * qty} EGP", fontSize = 12.sp, modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 4.dp), textAlign = TextAlign.Center)
-                        Text(text = "\uD83D\uDDD1", modifier = Modifier.weight(1f), textAlign = TextAlign.End, color = Color.Red)
-                    }
-                }
-            }
-        }
+        )
     }
 }
 
-@Preview(showBackground = true, name = "AddToOrderScreen Preview – with note")
-@Composable
-private fun AddToOrderScreenPreviewWithNote() {
-    MaterialTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            Text(text = "Added Items", fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.height(10.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color.White)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFF0066FF))
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Name", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 4.dp))
-                    Text("Quantity", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                    Text("Price", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                    Text("Total", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                    Text("Action", color = Color.White, fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 4.dp), textAlign = TextAlign.End)
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 8.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFFF7F7F7))
-                        .padding(horizontal = 12.dp, vertical = 14.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "Foul Sandwich", fontSize = 12.sp, modifier = Modifier.weight(1f))
-                    Text(text = "1", fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                    Text(text = "20.0 EGP", fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp), textAlign = TextAlign.Center)
-                    Text(text = "20.0 EGP", fontSize = 12.sp, modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 4.dp), textAlign = TextAlign.Center)
-                    Text(text = "\uD83D\uDDD1", modifier = Modifier.weight(1f), textAlign = TextAlign.End, color = Color.Red)
-                }
-                Text(
-                    text = "Note: extra pickles, no onions",
-                    fontSize = 11.sp,
-                    color = colorResource(id = R.color.punch),
-                    modifier = Modifier.padding(start = 24.dp, bottom = 12.dp)
-                )
-            }
-        }
-    }
+private data class AddOrderItemDisplayAdapter(
+    private val src: OrderModel
+) : CollectorOrderDisplayItem {
+    override val displayName: String? get() = src.itemName ?: src.note
+    override val displayQuantity: Int? get() = src.quantity
+    override val displayPrice: Double? get() = src.price
+    override val displayTotal: Double? get() = src.total
+    override val displayNote: String? get() = src.note
+    override val displayUsers: List<Nothing>? get() = null
 }

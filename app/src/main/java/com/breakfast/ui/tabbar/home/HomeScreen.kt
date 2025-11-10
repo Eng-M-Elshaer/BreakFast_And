@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import com.breakfast.managers.PreferenceManager
 import com.breakfast.ui.components.SelectStoreDialog
 import com.breakfast.models.StoreModel
+import com.breakfast.ui.components.BreakfastEmptyState
 import com.google.android.datatransport.BuildConfig
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
@@ -43,14 +44,14 @@ import com.google.android.datatransport.BuildConfig
 fun HomeScreen(navController: NavController? = null) {
 
     // Obtain HomeViewModel via factory to inject ApiService
-    val viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory(ApiClient.apiService))
+    val context = LocalContext.current
+    val viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory(ApiClient.apiService, context))
     val homeState = viewModel.homeState.collectAsState()
     val storesState = viewModel.storeState.collectAsState()
     val infoState = viewModel.infoState.collectAsState()
     val startOrderState = viewModel.startOrderState.collectAsState()
     val showSelectStore = remember { mutableStateOf(false) }
     val pendingStoreDialog = remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val myId = remember { PreferenceManager(context).getUser()?.id }
     val showForceUpdate = remember { mutableStateOf(false) }
     val requiredVersion = remember { mutableStateOf("") }
@@ -135,9 +136,17 @@ fun HomeScreen(navController: NavController? = null) {
                     }
                 }
                 is Result.Error -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = state.message ?: androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.failed_load_home))
-                    }
+                    BreakfastEmptyState(
+                        iconRes = com.breakfast.R.drawable.no_internet,
+                        title = state.message ?: stringResource(id = com.breakfast.R.string.failed_load_home),
+                        showButton = true,
+                        buttonText = stringResource(id = com.breakfast.R.string.retry),
+                        onButtonClick = { viewModel.fetchHome() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(12.dp))
                 }
                 is Result.Success -> {
                     val itemsList: List<HomeModel> = state.data.data ?: emptyList()
@@ -151,28 +160,13 @@ fun HomeScreen(navController: NavController? = null) {
                     }
 
                     if (itemsList.isEmpty()) {
-                        // Empty state
-                        Box(
+                        BreakfastEmptyState(
+                            iconRes = com.breakfast.R.drawable.no_orders,
+                            title = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_orders_available),
                             modifier = Modifier
                                 .weight(1f)
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                 Image(
-                                     painter = painterResource(id = com.breakfast.R.drawable.no_orders),
-                                     contentDescription = null,
-                                     modifier = Modifier.size(220.dp)
-                                 )
-                                Spacer(Modifier.height(8.dp))
-                                Text(
-                                    text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_orders_available),
-                                    style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
-
+                                .fillMaxWidth()
+                        )
                         Spacer(Modifier.height(12.dp))
                     } else {
                         // List of current orders

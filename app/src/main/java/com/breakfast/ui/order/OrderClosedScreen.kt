@@ -22,6 +22,7 @@ import com.breakfast.utils.Result
 import com.breakfast.viewmodel.OrderViewModel
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.Surface
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 /**
@@ -35,7 +36,8 @@ fun OrderClosedScreen(
     onClose: () -> Unit = {},
     onReopen: () -> Unit = {}
 ) {
-    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(ApiClient.apiService))
+    val context = LocalContext.current
+    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(ApiClient.apiService, context))
     val tax = remember { mutableStateOf("") }
     val delivery = remember { mutableStateOf("") }
     val statusState by viewModel.statusState.collectAsState()

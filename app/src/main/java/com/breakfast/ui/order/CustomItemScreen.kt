@@ -29,6 +29,7 @@ import com.breakfast.viewmodel.OrderViewModel
 import com.breakfast.designsystem.BreakfastButtonRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.breakfast.R
 import com.breakfast.models.CustomItemPayload
@@ -49,7 +50,8 @@ fun CustomItemScreen(
     navController: androidx.navigation.NavController? = null,
     incoming: CustomItemPayload? = null
 ) {
-    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(ApiClient.apiService))
+    val context = LocalContext.current
+    val viewModel: OrderViewModel = viewModel(factory = OrderViewModel.Factory(ApiClient.apiService, context))
     val name = remember { mutableStateOf(incoming?.name ?: "") }
     val price = remember { mutableStateOf(if (incoming != null) incoming.price.toString() else "") }
     val quantity = remember { mutableStateOf(if (incoming != null && incoming.quantity != 0) incoming.quantity.toString() else "") }

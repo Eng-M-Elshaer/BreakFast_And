@@ -1,6 +1,9 @@
 package com.breakfast
 
 import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import com.breakfast.managers.PreferenceManager
 import com.breakfast.network.ApiClient
 
@@ -23,10 +26,18 @@ class BreakfastApplication : Application() {
         ApiClient.setTokenProvider { preferenceManager.getToken() }
         // Provide the language to the ApiClient. Default to English if not set.
         ApiClient.setLanguageProvider { preferenceManager.getLanguage() ?: "en" }
+        ApiClient.setNetworkChecker { isNetworkAvailable(this) }
     }
 
     companion object {
         private lateinit var instance: BreakfastApplication
         fun get(): BreakfastApplication = instance
+    }
+
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = cm.activeNetwork ?: return false
+        val caps = cm.getNetworkCapabilities(network) ?: return false
+        return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 }
