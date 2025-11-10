@@ -1,5 +1,5 @@
-import androidx.compose.ui.res.painterResource
 
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.breakfast.ui.tabbar.notifications.NotificationScreen
 import com.breakfast.ui.tabbar.history.HistoryScreen
-import com.breakfast.ui.tabbar.history.HistoryDetailScreen
 import com.breakfast.ui.settings.SettingsScreen
 import com.breakfast.ui.order.OrderDetailsScreen
 import com.breakfast.ui.order.OrderClosedScreen
@@ -79,7 +78,6 @@ private fun BreakfastBottomBar(
         ) {
             items.forEach { item ->
                 val selected = currentDestination?.route == item.route
-
                 val containerModifier = Modifier
                     .size(44.dp)
                     .clip(CircleShape)

@@ -76,11 +76,16 @@ fun HomeScreen(navController: NavController? = null) {
         }
     }
 
-    LaunchedEffect(startOrderState.value) {
-        when (startOrderState.value) {
-            is com.breakfast.utils.Result.Success -> {
-                // order started successfully, refresh home
-                viewModel.fetchHome()
+    LaunchedEffect(storesState.value) {
+        when (storesState.value) {
+            is Result.Success -> {
+                if (pendingStoreDialog.value) {
+                    showSelectStore.value = true
+                }
+                pendingStoreDialog.value = false
+            }
+            is Result.Error -> {
+                pendingStoreDialog.value = false
             }
             else -> {}
         }

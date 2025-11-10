@@ -1,9 +1,7 @@
-package com.breakfast.ui.tabbar.history
+import com.breakfast.ui.order.OrderInfoCard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,9 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.draw.clip
@@ -50,10 +45,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
+import com.breakfast.designsystem.CollectorOrderDisplayItem
+import com.breakfast.designsystem.CollectorOrderItemCard
+import com.breakfast.designsystem.CollectorTableHeader
+import com.breakfast.designsystem.TabChip
 import com.breakfast.managers.PreferenceManager
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
@@ -91,6 +88,7 @@ fun HistoryDetailScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .background(colorResource(id = com.breakfast.R.color.background_grey), RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             when (val state = detailState) {
@@ -153,55 +151,7 @@ fun HistoryDetailScreen(
 
                         if (showTable) {
                             // header
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                                    .background(Color(0xFF0066FF))
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = stringResource(id = com.breakfast.R.string.name),
-                                        color = Color.White,
-                                        fontSize = 12.sp,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .padding(end = 4.dp)
-                                    )
-                                    Text(
-                                        text = stringResource(id = com.breakfast.R.string.quantity),
-                                        color = Color.White,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .padding(horizontal = 4.dp)
-                                    )
-                                    Text(
-                                        text = stringResource(id = com.breakfast.R.string.price),
-                                        color = Color.White,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .padding(horizontal = 4.dp)
-                                    )
-                                    Text(
-                                        text = stringResource(id = com.breakfast.R.string.total),
-                                        color = Color.White,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .padding(horizontal = 4.dp)
-                                    )
-                                }
-                            }
+                            CollectorTableHeader()
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -211,59 +161,19 @@ fun HistoryDetailScreen(
                                             bottomEnd = 20.dp
                                         )
                                     )
-                                    .background(Color.White)
+                                    .background(colorResource(id = com.breakfast.R.color.background_grey), RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                             ) {
                                 items.forEach { item ->
                                     Column(
-                                        Modifier
+                                        modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 8.dp, vertical = 10.dp)
-                                            .clip(RoundedCornerShape(16.dp))
-                                            .background(Color(0xFFF7F7F7))
-                                            .padding(horizontal = 12.dp, vertical = 14.dp)
                                     ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            Text(
-                                                text = item.itemName ?: "",
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .padding(end = 4.dp)
-                                            )
-                                            Text(
-                                                text = (item.quantity ?: 0).toString(),
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .padding(horizontal = 4.dp),
-                                                textAlign = TextAlign.Center
-                                            )
-                                            Text(
-                                                text = "${item.price ?: 0.0} EGP",
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .padding(horizontal = 4.dp),
-                                                textAlign = TextAlign.Center
-                                            )
-                                            Text(
-                                                text = "${item.totalPrice ?: 0.0} EGP",
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .padding(start = 4.dp),
-                                                textAlign = TextAlign.End
-                                            )
-                                        }
-                                        if (!item.note.isNullOrBlank()) {
-                                            Text(
-                                                text = "${stringResource(com.breakfast.R.string.note)}: ${item.note}",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = colorResource(com.breakfast.R.color.punch),
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                                textAlign = TextAlign.Center
-                                            )
-                                        }
+                                        CollectorOrderItemCard(
+                                            item = HistoryOrderItemDisplayAdapter(item),
+                                            onShowUsers = { _: List<com.breakfast.models.Collector> -> },
+                                            showInfoAction = false
+                                        )
                                     }
                                 }
                             }
@@ -287,31 +197,14 @@ fun HistoryDetailScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // Order info card
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(20.dp)),
-                            shape = RoundedCornerShape(20.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(18.dp)) {
-                                Text(
-                                    text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.order_info),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Text(text = "${stringResource(com.breakfast.R.string.quantity)}: ${detail?.count}")
-                                Divider(modifier = Modifier.padding(vertical = 12.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(text = stringResource(com.breakfast.R.string.total))
-                                    Text(text = "${detail?.totalPrice} EGP", fontWeight = FontWeight.SemiBold)
-                                }
-                            }
-                        }
+                        OrderInfoCard(
+                            title = stringResource(id = com.breakfast.R.string.order_info),
+                            quantity = (detail?.count ?: 0).toString(),
+                            tax = 0.0,
+                            delivery = 0.0,
+                            total = detail?.totalPrice ?: 0.0,
+                            onInfoClick = null
+                        )
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     if (detail?.order?.collector?.id == myId) {
@@ -336,28 +229,7 @@ fun HistoryDetailScreen(
     }
 }
 
-@Composable
-private fun TabChip(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .height(48.dp)
-            .clip(RoundedCornerShape(28.dp))
-            .background(if (selected) Color(0xFFF1F1F1) else Color.Transparent)
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = if (selected) Color.Black else Color.White,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
-}
+
 @Preview(showBackground = true, name = "History Detail – Table")
 @Composable
 private fun HistoryDetailScreenPreviewTable() {
@@ -447,106 +319,25 @@ private fun HistoryDetailPreviewContent(
                         .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                         .background(Color(0xFF0066FF))
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 10.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.name),
-                            color = Color.White,
-                            fontSize = 12.sp,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 4.dp)
-                        )
-                        Text(
-                            text = stringResource(id = R.string.quantity),
-                            color = Color.White,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp)
-                        )
-                        Text(
-                            text = stringResource(id = R.string.price),
-                            color = Color.White,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp)
-                        )
-                        Text(
-                            text = stringResource(id = R.string.total),
-                            color = Color.White,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp)
-                        )
-                    }
+                    CollectorTableHeader()
                 }
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-                        .background(Color.White)
+                        .background(colorResource(id = com.breakfast.R.color.background_grey), RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                 ) {
                     items.forEach { item ->
                         Column(
-                            Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp, vertical = 10.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(Color(0xFFF7F7F7))
-                                .padding(horizontal = 12.dp, vertical = 14.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = item.itemName ?: "",
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 4.dp)
-                                )
-                                Text(
-                                    text = (item.quantity ?: 0).toString(),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(horizontal = 4.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                                Text(
-                                    text = "${item.price ?: 0.0} EGP",
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(horizontal = 4.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                                Text(
-                                    text = "${item.totalPrice ?: 0.0} EGP",
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(start = 4.dp),
-                                    textAlign = TextAlign.End
-                                )
-                            }
-                            if (!item.note.isNullOrBlank()) {
-                                Text(
-                                    text = "${stringResource(com.breakfast.R.string.note)}: ${item.note}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = colorResource(com.breakfast.R.color.punch),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
+                            CollectorOrderItemCard(
+                                item = HistoryOrderItemDisplayAdapter(item),
+                                onShowUsers = { _: List<com.breakfast.models.Collector> -> },
+                                showInfoAction = false
+                            )
                         }
                     }
                 }
@@ -576,27 +367,14 @@ private fun HistoryDetailPreviewContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp)),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-                Column(modifier = Modifier.padding(18.dp)) {
-                    Text(text = "Order Info", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(text = "Quantity: ${items.sumOf { it.quantity ?: 0 }}")
-                    Divider(modifier = Modifier.padding(vertical = 12.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "Total:")
-                        Text(text = "${items.sumOf { it.totalPrice ?: 0.0 }} EGP", fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
+            OrderInfoCard(
+                title = stringResource(id = com.breakfast.R.string.order_info),
+                quantity = items.sumOf { it.quantity ?: 0 }.toString(),
+                tax = 0.0,
+                delivery = 0.0,
+                total = items.sumOf { it.totalPrice ?: 0.0 },
+                onInfoClick = null
+            )
             Spacer(modifier = Modifier.height(72.dp)) // give space for bottom button
         }
 
@@ -614,4 +392,15 @@ private fun HistoryDetailPreviewContent(
             Text(text = stringResource(R.string.collector_view))
         }
     }
+}
+
+private data class HistoryOrderItemDisplayAdapter(
+    val src: OrderHistoryItemModel
+) : CollectorOrderDisplayItem {
+    override val displayName: String? get() = src.itemName
+    override val displayQuantity: Int? get() = src.quantity
+    override val displayPrice: Double? get() = src.price
+    override val displayTotal: Double? get() = src.totalPrice
+    override val displayNote: String? get() = src.note
+    override val displayUsers: List<com.breakfast.models.Collector>? get() = src.users
 }

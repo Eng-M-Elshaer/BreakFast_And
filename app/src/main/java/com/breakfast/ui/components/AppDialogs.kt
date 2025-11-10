@@ -34,6 +34,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
+import com.breakfast.designsystem.BreakfastOutlinedTextField
 import com.breakfast.models.StoreModel
 
 @Composable
@@ -221,21 +222,21 @@ fun SelectStoreDialog(
 
                 Spacer(Modifier.height(16.dp))
 
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = colorResource(id = R.color.woodsmoke),
-                    modifier = Modifier.fillMaxWidth()
-                )
+//                Text(
+//                    text = title,
+//                    style = MaterialTheme.typography.titleMedium,
+//                    fontWeight = FontWeight.SemiBold,
+//                    color = colorResource(id = R.color.woodsmoke),
+//                    modifier = Modifier.fillMaxWidth()
+//                )
 
                 Spacer(Modifier.height(8.dp))
 
-                // 🔥 الجزء المهم المعدل
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
+                    BreakfastOutlinedTextField(
                         value = selectedStore.value?.name ?: "",
                         onValueChange = {},
+                        label = stringResource(id = R.string.store),
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(
@@ -248,26 +249,18 @@ fun SelectStoreDialog(
                                 interactionSource = remember { MutableInteractionSource() }
                             ),
                         enabled = false,
-                        readOnly = true,
-                        trailingIcon = {
+                        isError = false,
+                        trailing = {
                             Icon(
-                                imageVector = if (expanded.value)
-                                    Icons.Filled.ArrowDropUp
-                                else
-                                    Icons.Filled.ArrowDropDown,
-                                contentDescription = null
+                                imageVector = if (expanded.value) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                                contentDescription = null,
+                                modifier = Modifier.clickable {
+                                    if (stores.isNotEmpty()) {
+                                        expanded.value = !expanded.value
+                                    }
+                                }
                             )
-                        },
-                        placeholder = {
-                            Text(text = stringResource(id = R.string.store))
-                        },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                            disabledBorderColor = MaterialTheme.colorScheme.outline,
-                            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        }
                     )
 
                     DropdownMenu(

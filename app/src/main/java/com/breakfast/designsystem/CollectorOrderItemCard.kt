@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import com.breakfast.R
 import com.breakfast.models.OrderHistoryItemModel
 
@@ -62,7 +63,7 @@ fun CollectorOrderItemCard(
                 text = item.displayName ?: "--",
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1.5f)
             )
             Text(
                 text = (item.displayQuantity ?: 0).toString(),
@@ -114,5 +115,23 @@ fun CollectorOrderItemCard(
         item = HistoryItemAdapter(item),
         onShowUsers = onShowUsers,
         showInfoAction = showInfoAction
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CollectorOrderItemCardPreview() {
+    val sample = object : CollectorOrderDisplayItem {
+        override val displayName: String? = "فول بلدي"
+        override val displayQuantity: Int? = 2
+        override val displayPrice: Double? = 15.0
+        override val displayTotal: Double? = 30.0
+        override val displayNote: String? = "بدون طحينة"
+        override val displayUsers: List<com.breakfast.models.Collector>? = emptyList()
+    }
+    CollectorOrderItemCard(
+        item = sample,
+        onShowUsers = {},
+        showInfoAction = false
     )
 }

@@ -35,11 +35,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import coil.compose.AsyncImage
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
 import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.designsystem.CollectorOrderItemCard
+import com.breakfast.designsystem.CollectorTableHeader
 import com.breakfast.models.ApiResponse
 import com.breakfast.models.CollectorHistoryModel
 import com.breakfast.models.OrderInfoModel
@@ -94,7 +96,13 @@ fun OrderDetailsScreen(
     LaunchedEffect(reOpenState.value) {
         if (reOpenState.value is Result.Success<*>) {
             onReopen()
-            navController?.popBackStack()
+            navController?.navigate(BottomNavItem.Home.route) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
         }
     }
 
@@ -391,37 +399,9 @@ private data class OrderItemDisplayAdapter(private val src: OrderItem) : Collect
 
 @Composable
 private fun CollectorTableSection(items: List<UsersItem>) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(id = com.breakfast.R.color.blue_ribbon), shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(id = R.string.name),
-            color = Color.White,
-            modifier = Modifier.weight(1.5f)
-        )
-        Text(
-            text = stringResource(id = R.string.quantity),
-            color = Color.White,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = stringResource(id = R.string.price),
-            color = Color.White,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = stringResource(id = R.string.total_price),
-            color = Color.White,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
-    }
+
+    //Header
+    CollectorTableHeader(showAction = false)
 
     LazyColumn(
         modifier = Modifier
@@ -548,18 +528,20 @@ private fun ListViewSection(items: List<UsersItem>) {
     }
 }
 
+
 @Composable
-private fun OrderInfoCard(
+fun OrderInfoCard(
+    title: String = stringResource(id = R.string.order_info),
     quantity: String,
     tax: Double,
     delivery: Double,
     total: Double,
-    onInfoClick: () -> Unit
+    onInfoClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(width = 1.dp, color = Color(0xFFE5F0FF), shape = RoundedCornerShape(24.dp))
+            .border(1.dp, Color(0xFFE5F0FF), RoundedCornerShape(24.dp))
             .background(Color.White, RoundedCornerShape(24.dp))
             .padding(16.dp)
     ) {
@@ -568,46 +550,39 @@ private fun OrderInfoCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = stringResource(id = R.string.order_info),
+                text = title,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f)
             )
-            IconButton(onClick = onInfoClick) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_info),
-                    contentDescription = stringResource(id = R.string.info),
-                    tint = Color(0xFF0F6BFF),
-                    modifier = Modifier.size(24.dp)
-                )
+            if (onInfoClick != null) {
+                IconButton(onClick = onInfoClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_info),
+                        contentDescription = stringResource(id = R.string.info),
+                        tint = Color(0xFF0F6BFF),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
         Spacer(Modifier.height(8.dp))
         Text(text = stringResource(id = R.string.quantity_with_value, quantity))
 
         Spacer(Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = stringResource(id = R.string.tax))
             Text(text = stringResource(id = R.string.price_with_currency, tax))
         }
         Spacer(Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = stringResource(id = R.string.delivery))
             Text(text = stringResource(id = R.string.price_with_currency, delivery))
         }
         Spacer(Modifier.height(8.dp))
         Divider()
         Spacer(Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = stringResource(id = R.string.total))
             Text(
                 text = stringResource(id = R.string.price_with_currency, total),
