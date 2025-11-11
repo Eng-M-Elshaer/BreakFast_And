@@ -9,8 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 import java.io.File
 import java.io.FileOutputStream
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,7 +28,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -127,25 +124,37 @@ fun OrderDetailsScreen(
                 // see instructions for details
                 actions = {
                     val context = LocalContext.current
-                    IconButton(
-                        onClick = {
-                            // we only have real data when previewData == null and state is success
-                            val currentState = collectorState.value
-                            if (currentState is Result.Success<*>) {
+                    val currentState = collectorState.value
+                    val hasTableData = when (currentState) {
+                        is Result.Success<*> -> {
+                            if (previewData != null) {
+                                val data = currentState.data as? CollectorHistoryModel
+                                 data?.usersItems.isNullOrEmpty()
+                            } else {
+                                val apiResp = currentState.data as? com.breakfast.models.ApiResponse<com.breakfast.models.CollectorHistoryModel>
+                                val data = apiResp?.data
+                                !data?.usersItems.isNullOrEmpty()
+                            }
+                        }
+                        else -> false
+                    }
+                    if (hasTableData) {
+                        IconButton(
+                            onClick = {
                                 val model: CollectorHistoryModel = if (previewData != null) {
-                                    currentState.data as CollectorHistoryModel
+                                    (currentState as Result.Success<*>).data as CollectorHistoryModel
                                 } else {
-                                    val apiResp = currentState.data as com.breakfast.models.ApiResponse<com.breakfast.models.CollectorHistoryModel>
+                                    val apiResp = (currentState as Result.Success<*>).data as com.breakfast.models.ApiResponse<com.breakfast.models.CollectorHistoryModel>
                                     apiResp.data ?: return@IconButton
                                 }
                                 createAndShareOrderPdf(context, model)
                             }
+                        ) {
+                            Icon(
+                                Icons.Filled.IosShare,
+                                contentDescription = stringResource(id = R.string.share)
+                            )
                         }
-                    ) {
-                        Icon(
-                            Icons.Filled.IosShare,
-                            contentDescription = stringResource(id = R.string.share)
-                        )
                     }
                 }
             )
@@ -400,7 +409,7 @@ private fun CollectorTableSection(items: List<UsersItem>) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colorResource(id = com.breakfast.R.color.background_grey))
+                    .background(colorResource(id = R.color.background_grey))
                     .padding(horizontal = 4.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -413,12 +422,12 @@ private fun CollectorTableSection(items: List<UsersItem>) {
                         modifier = Modifier
                             .size(52.dp)
                             .clip(CircleShape),
-                        placeholder = painterResource(id = com.breakfast.R.drawable.image_placeholder),
-                        error = painterResource(id = com.breakfast.R.drawable.image_placeholder)
+                        placeholder = painterResource(id = R.drawable.image_placeholder),
+                        error = painterResource(id = R.drawable.image_placeholder)
                     )
                 } else {
                     Icon(
-                        painter = painterResource(id = com.breakfast.R.drawable.image_placeholder),
+                        painter = painterResource(id = R.drawable.image_placeholder),
                         contentDescription = null,
                         tint = Color.Unspecified,
                         modifier = Modifier
@@ -438,7 +447,7 @@ private fun CollectorTableSection(items: List<UsersItem>) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            color = colorResource(id = com.breakfast.R.color.background_grey),
+                            color = colorResource(id = R.color.background_grey),
                             shape = if (isLast) RoundedCornerShape(
                                 bottomStart = 24.dp,
                                 bottomEnd = 24.dp
@@ -479,12 +488,12 @@ private fun ListViewSection(items: List<UsersItem>) {
                         modifier = Modifier
                             .size(52.dp)
                             .clip(CircleShape),
-                        placeholder = painterResource(id = com.breakfast.R.drawable.image_placeholder),
-                        error = painterResource(id = com.breakfast.R.drawable.image_placeholder)
+                        placeholder = painterResource(id = R.drawable.image_placeholder),
+                        error = painterResource(id = R.drawable.image_placeholder)
                     )
                 } else {
                     Icon(
-                        painter = painterResource(id = com.breakfast.R.drawable.image_placeholder),
+                        painter = painterResource(id = R.drawable.image_placeholder),
                         contentDescription = null,
                         tint = Color.Unspecified,
                         modifier = Modifier
@@ -502,7 +511,7 @@ private fun ListViewSection(items: List<UsersItem>) {
             user.orderItems?.forEach { item ->
                 if (!item.note.isNullOrBlank()) {
                     Text(
-                        text = "${item.quantity ?: 0} - ${item.itemName ?: ""} - ${item.note ?: ""} - ${item.total ?: 0.0} EGP",
+                        text = "${item.quantity ?: 0} - ${item.itemName ?: ""} - ${item.note} - ${item.total ?: 0.0} EGP",
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                 } else {
