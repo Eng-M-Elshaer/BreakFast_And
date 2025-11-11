@@ -52,6 +52,7 @@ import androidx.navigation.NavController
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
 import com.breakfast.designsystem.BreakfastOutlinedTextField
+import com.breakfast.designsystem.BreakfastScreen
 import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.models.CustomItemPayload
 import com.breakfast.designsystem.CollectorOrderItemCard
@@ -96,27 +97,20 @@ fun CollectorDetailsScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.collector_details)) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        val popped = navController?.popBackStack() ?: false
-                        if (!popped) {
-                            backDispatcher?.onBackPressed()
-                        }
-                    }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
-                    }
-                }
-            )
+    BreakfastScreen(
+        title = stringResource(id = R.string.collector_details),
+        onLeftAction = {
+            val popped = navController?.popBackStack() ?: false
+            if (!popped) {
+                backDispatcher?.onBackPressed()
+            }
         },
         bottomBar = {
             if (isStoppedUi) {
                 BreakfastButtonRes(
                     onClick = {
-                        val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
+                        val orderId =
+                            (collectorState as? Result.Success)?.data?.data?.order?.id
                         if (orderId != null) {
                             val tax = taxText.value.toDoubleOrNull() ?: 0.0
                             val delivery = deliveryText.value.toDoubleOrNull() ?: 0.0
@@ -126,35 +120,35 @@ fun CollectorDetailsScreen(
                     },
                     enabled = true,
                     isHasObserver = false,
-                    iconRes = com.breakfast.R.drawable.xmark_circle_fill,
+                    iconRes = R.drawable.xmark_circle_fill,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp, bottom = 16.dp)
                         .padding(horizontal = 16.dp, vertical = 12.dp),
-                    ) {
-                    Text(text = stringResource(id = com.breakfast.R.string.close_order))
+                ) {
+                    Text(text = stringResource(id = R.string.close_order))
                 }
             } else {
                 BreakfastButtonRes(
                     onClick = {
-                        val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
+                        val orderId =
+                            (collectorState as? Result.Success)?.data?.data?.order?.id
                         if (orderId != null) {
                             viewModel.stopCollecteing(orderId)
                         }
                     },
                     enabled = true,
                     isHasObserver = false,
-                    iconRes = com.breakfast.R.drawable.xmark_circle_fill,
+                    iconRes = R.drawable.xmark_circle_fill,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp, bottom = 16.dp)
                         .padding(horizontal = 16.dp)
                 ) {
-                    Text(text = stringResource(id = com.breakfast.R.string.stop_collecting))
+                    Text(text = stringResource(id = R.string.stop_collecting))
                 }
             }
         }
-
     ) { paddingValues ->
         CollectorDetailsContent(
             state = collectorState,

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
+import com.breakfast.designsystem.BreakfastScreen
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,6 +21,7 @@ import com.breakfast.viewmodel.HomeViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
@@ -113,35 +114,30 @@ fun HomeScreen(navController: NavController? = null) {
         }
     }
 
-    Scaffold { paddingValues ->
+    BreakfastScreen(
+        title = stringResource(id = R.string.home_screen_title)
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
                 .fillMaxSize()
         ) {
-            // Big title like the screenshot
-            Text(
-                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.home_screen_title),
-                fontWeight = FontWeight.SemiBold,
-                style = androidx.compose.material3.MaterialTheme.typography.headlineLarge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 16.dp)
-            )
-
             when (val state = homeState.value) {
                 is Result.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         CircularProgressIndicator()
                     }
                 }
                 is Result.Error -> {
                     BreakfastEmptyState(
-                        iconRes = com.breakfast.R.drawable.no_internet,
-                        title = state.message ?: stringResource(id = com.breakfast.R.string.failed_load_home),
+                        iconRes = R.drawable.no_internet,
+                        title = state.message ?: stringResource(id = R.string.failed_load_home),
                         showButton = true,
-                        buttonText = stringResource(id = com.breakfast.R.string.retry),
+                        buttonText = stringResource(id = R.string.retry),
                         onButtonClick = { viewModel.fetchHome() },
                         modifier = Modifier
                             .weight(1f)
@@ -162,15 +158,14 @@ fun HomeScreen(navController: NavController? = null) {
 
                     if (itemsList.isEmpty()) {
                         BreakfastEmptyState(
-                            iconRes = com.breakfast.R.drawable.no_orders,
-                            title = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_orders_available),
+                            iconRes = R.drawable.no_orders,
+                            title = stringResource(id = R.string.no_orders_available),
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxWidth()
                         )
                         Spacer(Modifier.height(12.dp))
                     } else {
-                        // List of current orders
                         LazyColumn(
                             modifier = Modifier
                                 .weight(1f)
@@ -178,8 +173,10 @@ fun HomeScreen(navController: NavController? = null) {
                             contentPadding = PaddingValues(vertical = 8.dp)
                         ) {
                             items(itemsList) { homeItem ->
-                                val title = homeItem.collector?.name ?: (stringResource(id = com.breakfast.R.string.order) + " #${homeItem.id ?: ""}")
-                                val subtitle = if (homeItem.store?.name != null) homeItem.store.name  else (stringResource(id = com.breakfast.R.string.status) + ": ${homeItem.status?.name ?: ""}")
+                                val title = homeItem.collector?.name
+                                    ?: (stringResource(id = R.string.order) + " #${homeItem.id ?: ""}")
+                                val subtitle = if (homeItem.store?.name != null) homeItem.store.name
+                                else (stringResource(id = R.string.status) + ": ${homeItem.status?.name ?: ""}")
 
                                 OrderCard(
                                     title = title,
@@ -206,7 +203,7 @@ fun HomeScreen(navController: NavController? = null) {
                             },
                             enabled = true,
                             isHasObserver = false,
-                            iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,
+                            iconRes = R.drawable.list_bullet_clipboard_fill,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
@@ -221,7 +218,7 @@ fun HomeScreen(navController: NavController? = null) {
                             },
                             enabled = true,
                             isHasObserver = false,
-                            iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,
+                            iconRes = R.drawable.list_bullet_clipboard_fill,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
@@ -233,6 +230,7 @@ fun HomeScreen(navController: NavController? = null) {
                 }
             }
         }
+        // keep dialogs below
         if (pendingStoreDialog.value && storesState.value is Result.Loading) {
             androidx.compose.ui.window.Dialog(onDismissRequest = { /* block dismiss while loading */ }) {
                 androidx.compose.material3.Card(
@@ -289,14 +287,14 @@ fun HomeScreen(navController: NavController? = null) {
                             context.startActivity(webIntent)
                         }
                     }) {
-                        Text(text = stringResource(id = com.breakfast.R.string.update_now))
+                        Text(text = stringResource(id = R.string.update_now))
                     }
                 },
                 title = {
-                    Text(text = stringResource(id = com.breakfast.R.string.update_required))
+                    Text(text = stringResource(id = R.string.update_required))
                 },
                 text = {
-                    Text(text = stringResource(id = com.breakfast.R.string.update_required_message))
+                    Text(text = stringResource(id = R.string.update_required_message))
                 }
             )
         }

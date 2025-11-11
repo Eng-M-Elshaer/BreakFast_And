@@ -68,8 +68,8 @@ fun BreakfastButton(
 
     val contentColor: Color = when {
         useLightGrey -> Color.DarkGray
-        isDanger && enabled -> colorResource(id = R.color.card_bg)
-        else -> colorResource(id = R.color.card_bg)
+        isDanger && enabled -> Color.White
+        else -> Color.White
     }
 
     Box(

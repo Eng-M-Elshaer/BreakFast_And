@@ -19,7 +19,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -36,7 +38,6 @@ import com.breakfast.ui.tabbar.notifications.NotificationScreen
 import com.breakfast.ui.tabbar.history.HistoryScreen
 import com.breakfast.ui.settings.SettingsScreen
 import com.breakfast.ui.order.OrderDetailsScreen
-import com.breakfast.ui.order.OrderClosedScreen
 import com.breakfast.ui.order.CollectorDetailsScreen
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.res.colorResource
@@ -62,11 +63,14 @@ private fun BreakfastBottomBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    val insets = WindowInsets.navigationBars.asPaddingValues()
+    val bottomPadding = insets.calculateBottomPadding() + 12.dp
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .padding(bottom = 24.dp),
+            .padding(bottom = bottomPadding),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 8.dp
@@ -235,14 +239,6 @@ fun MainScreen(rootNavController: NavController? = null) {
                     )
                 )
             }
-            // Order closed screen with dynamic arguments
-            composable(
-                route = "order_closed/{orderId}",
-                arguments = listOf(navArgument("orderId") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
-                OrderClosedScreen(orderId = orderId, onClose = { navController.popBackStack() }, onReopen = { navController.popBackStack() })
-            }
             // Collector details screen
             composable(
                 route = "collector_details",
@@ -259,19 +255,6 @@ fun MainScreen(rootNavController: NavController? = null) {
             ) { backStackEntry ->
                 val orderId = backStackEntry.arguments?.getInt("orderId") ?: 0
                 HistoryDetailScreen(orderId = orderId, navController = navController)
-            }
-
-            // Assign item screen for assigning an order item to a user
-            composable(
-                route = "assign_item/{orderId}/{orderItemId}",
-                arguments = listOf(
-                    navArgument("orderId") { type = NavType.IntType },
-                    navArgument("orderItemId") { type = NavType.IntType }
-                )
-            ) { backStackEntry ->
-                val orderIdArg = backStackEntry.arguments?.getInt("orderId") ?: 0
-                val orderItemId = backStackEntry.arguments?.getInt("orderItemId") ?: 0
-                AssignItemScreen(orderId = orderIdArg, orderItemId = orderItemId, navController = navController)
             }
 
             // Settings screen for version, about us and language selection

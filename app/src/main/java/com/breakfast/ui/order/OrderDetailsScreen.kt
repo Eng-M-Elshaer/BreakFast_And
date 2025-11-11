@@ -36,6 +36,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import coil.compose.AsyncImage
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
+import com.breakfast.designsystem.BreakfastScreen
 import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.designsystem.CollectorOrderItemCard
 import com.breakfast.designsystem.CollectorTableHeader
@@ -108,56 +109,43 @@ fun OrderDetailsScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(id = R.string.order_details)) },
-                navigationIcon = {
-                    IconButton(onClick = { navController?.popBackStack() }) {
-                        Icon(
-                            Icons.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.back)
-                        )
-                    }
-                },
-                // replaced actions block
-                // see instructions for details
-                actions = {
-                    val context = LocalContext.current
-                    val currentState = collectorState.value
-                    val hasTableData = when (currentState) {
-                        is Result.Success<*> -> {
-                            if (previewData != null) {
-                                val data = currentState.data as? CollectorHistoryModel
-                                 data?.usersItems.isNullOrEmpty()
-                            } else {
-                                val apiResp = currentState.data as? com.breakfast.models.ApiResponse<com.breakfast.models.CollectorHistoryModel>
-                                val data = apiResp?.data
-                                !data?.usersItems.isNullOrEmpty()
-                            }
-                        }
-                        else -> false
-                    }
-                    if (hasTableData) {
-                        IconButton(
-                            onClick = {
-                                val model: CollectorHistoryModel = if (previewData != null) {
-                                    (currentState as Result.Success<*>).data as CollectorHistoryModel
-                                } else {
-                                    val apiResp = (currentState as Result.Success<*>).data as com.breakfast.models.ApiResponse<com.breakfast.models.CollectorHistoryModel>
-                                    apiResp.data ?: return@IconButton
-                                }
-                                createAndShareOrderPdf(context, model)
-                            }
-                        ) {
-                            Icon(
-                                Icons.Filled.IosShare,
-                                contentDescription = stringResource(id = R.string.share)
-                            )
-                        }
+    BreakfastScreen(
+        title = stringResource(id = R.string.order_details),
+        onLeftAction = { navController?.popBackStack() },
+        rightAction = {
+            val context = LocalContext.current
+            val currentState = collectorState.value
+            val hasTableData = when (currentState) {
+                is Result.Success<*> -> {
+                    if (previewData != null) {
+                        val data = currentState.data as? CollectorHistoryModel
+                        data?.usersItems.isNullOrEmpty()
+                    } else {
+                        val apiResp = currentState.data as? ApiResponse<CollectorHistoryModel>
+                        val data = apiResp?.data
+                        !data?.usersItems.isNullOrEmpty()
                     }
                 }
-            )
+                else -> false
+            }
+            if (hasTableData) {
+                IconButton(
+                    onClick = {
+                        val model: CollectorHistoryModel = if (previewData != null) {
+                            (currentState as Result.Success<*>).data as CollectorHistoryModel
+                        } else {
+                            val apiResp = (currentState as Result.Success<*>).data as ApiResponse<CollectorHistoryModel>
+                            apiResp.data ?: return@IconButton
+                        }
+                        createAndShareOrderPdf(context, model)
+                    }
+                ) {
+                    Icon(
+                        Icons.Filled.IosShare,
+                        contentDescription = stringResource(id = R.string.share)
+                    )
+                }
+            }
         },
         bottomBar = {
             BreakfastButtonRes(
@@ -176,7 +164,7 @@ fun OrderDetailsScreen(
                 Text(text = stringResource(id = R.string.re_open_order))
             }
         }
-    ) { paddingValues ->
+    ){ paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -185,7 +173,7 @@ fun OrderDetailsScreen(
         ) {
             Spacer(Modifier.height(12.dp))
 
-            // segmented
+            // Segmented
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

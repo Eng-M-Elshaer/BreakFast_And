@@ -7,7 +7,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +35,7 @@ import com.breakfast.models.CustomItemPayload
 import com.breakfast.ui.components.ErrorDialog
 import com.breakfast.designsystem.BreakfastOutlinedTextField
 import androidx.compose.ui.text.input.KeyboardType
+import com.breakfast.designsystem.BreakfastScreen
 
 /**
  * Screen for creating a custom item with a name, price, quantity and optional note.
@@ -86,23 +86,9 @@ fun CustomItemScreen(
 
     val scrollState = rememberScrollState()
 
-    Scaffold(
-        topBar = {
-            androidx.compose.material3.TopAppBar(
-                title = {
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.custom_item),
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 22.sp
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController?.popBackStack() }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
-                    }
-                }
-            )
-        },
+    BreakfastScreen(
+        title = stringResource(id = R.string.custom_item),
+        onLeftAction = { navController?.popBackStack() },
         bottomBar = {
             BreakfastButtonRes(
                 iconRes = com.breakfast.R.drawable.plus,

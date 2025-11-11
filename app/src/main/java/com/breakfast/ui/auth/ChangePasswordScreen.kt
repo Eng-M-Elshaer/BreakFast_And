@@ -1,4 +1,3 @@
-
 package com.breakfast.ui.auth
 import com.breakfast.designsystem.BreakfastOutlinedTextField
 import androidx.compose.ui.text.input.KeyboardType
@@ -14,10 +13,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,7 +30,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
@@ -93,6 +96,7 @@ fun ChangePasswordScreen(navController: NavController? = null) {
                 viewModel.changePassword(currentPassword.value, newPassword.value, confirmPassword.value)
             }
         },
+        onBack = { navController?.popBackStack() },
         illustrationResId = null
     )
 
@@ -124,6 +128,7 @@ private fun ChangePasswordContent(
     onConfirmPasswordChange: (String) -> Unit,
     changeState: Result<*>?,
     onChangePassword: () -> Unit,
+    onBack: (() -> Unit)? = null,
     illustrationResId: Int? = null
 ) {
 
@@ -157,6 +162,31 @@ private fun ChangePasswordContent(
         confirmError == null
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier.statusBarsPadding(),
+                title = {
+                    Text(
+                        text = stringResource(id = com.breakfast.R.string.change_password_title),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = colorResource(id = com.breakfast.R.color.woodsmoke),
+                    )
+                },
+                navigationIcon = {
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = null,
+                                tint = colorResource(id = com.breakfast.R.color.woodsmoke)
+                            )
+                        }
+                    }
+                },
+                actions = {}
+            )
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -181,14 +211,30 @@ private fun ChangePasswordContent(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Title & subtitle
-            Text(
-                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.change_password_title),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(id = com.breakfast.R.color.woodsmoke),
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Title & subtitle with optional back button
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                if (onBack != null) {
+//                    IconButton(onClick = onBack) {
+//                        Icon(
+//                            imageVector = Icons.Default.ArrowBack,
+//                            contentDescription = null,
+//                            tint = colorResource(id = com.breakfast.R.color.woodsmoke)
+//                        )
+//                    }
+//                }
+//                Text(
+//                    text = stringResource(id = com.breakfast.R.string.change_password_title),
+//                    style = MaterialTheme.typography.headlineMedium,
+//                    fontWeight = FontWeight.Bold,
+//                    color = colorResource(id = com.breakfast.R.color.woodsmoke),
+//                    modifier = Modifier
+//                        .weight(1f)
+//                        .padding(start = if (onBack != null) 4.dp else 0.dp)
+//                )
+//            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -283,7 +329,7 @@ private fun ChangePasswordContent(
                 isHasObserver = !canChange,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.update_password))
+                Text(stringResource(id = com.breakfast.R.string.update_password))
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -309,6 +355,7 @@ private fun ChangePasswordPreview() {
         onConfirmPasswordChange = { confirm.value = it },
         changeState = state,
         onChangePassword = {},
+        onBack = null,
         illustrationResId = null
     )
 }

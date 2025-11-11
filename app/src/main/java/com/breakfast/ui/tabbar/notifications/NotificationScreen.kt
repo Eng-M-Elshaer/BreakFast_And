@@ -1,19 +1,16 @@
 package com.breakfast.ui.tabbar.notifications
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
+import com.breakfast.designsystem.BreakfastScreen
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,10 +27,10 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.breakfast.ui.components.ErrorDialog
@@ -83,40 +80,28 @@ fun NotificationScreen(navController: NavController) {
         viewModel.fetchNotifications()
     }
 
-    Scaffold { paddingValues ->
+    BreakfastScreen(
+        title = stringResource(id = R.string.notifications),
+        rightAction = {
+            androidx.compose.material3.TextButton(onClick = { viewModel.markAllNotificationsAsRead() }) {
+                Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Filled.Checklist,
+                    tint = colorResource(R.color.blue_ribbon),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = stringResource(id = R.string.mark_all_read),
+                    color = colorResource(R.color.blue_ribbon),
+                    modifier = Modifier.padding(start = 6.dp)
+                )
+            }
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
+                .fillMaxWidth()
         ) {
-            androidx.compose.foundation.layout.Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.notifications),
-                    fontWeight = FontWeight.SemiBold,
-                    style = androidx.compose.material3.MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.weight(1f)
-                )
-                androidx.compose.material3.TextButton(onClick = { viewModel.markAllNotificationsAsRead() }) {
-                    Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Filled.Checklist,
-                        tint = colorResource(com.breakfast.R.color.blue_ribbon),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(18.dp)
-                            .padding(start = 2.dp)
-                    )
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.mark_all_read),
-                        color = colorResource(com.breakfast.R.color.blue_ribbon),
-                        modifier = Modifier.padding(start = 6.dp)
-                    )
-                }
-            }
             when (val state = notificationsState.value) {
                 is Result.Loading -> {
                     Box(
@@ -142,20 +127,24 @@ fun NotificationScreen(navController: NavController) {
                 }
                 is Result.Success -> {
                     val itemsList = state.data.data ?: emptyList()
-
                     if (itemsList.isEmpty()) {
                         BreakfastEmptyState(
-                            iconRes = com.breakfast.R.drawable.no_notification,
-                            title = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_notifications),
+                            iconRes = R.drawable.no_notification,
+                            title = stringResource(id = R.string.no_notifications),
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxWidth()
                         )
                     } else {
-                        LazyColumn {
+                        LazyColumn(
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                top = 0.dp,
+                                bottom = innerPadding.calculateBottomPadding()
+                            )
+                        ) {
                             items(itemsList) { notification ->
                                 val isUnread = notification.isRead == true
-                                val title = notification.title ?: androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.notification)
+                                val title = notification.title ?: stringResource(id = R.string.notification)
                                 val subtitle = notification.message ?: ""
                                 val date = notification.createdAt ?: ""
                                 OrderCard(
@@ -164,7 +153,7 @@ fun NotificationScreen(navController: NavController) {
                                     date = date,
                                     avatarUrl = null,
                                     icon = if (isUnread) null else androidx.compose.material.icons.Icons.Filled.Circle,
-                                    avatarRes = com.breakfast.R.drawable.circle_logo,
+                                    avatarRes = R.drawable.circle_logo,
                                     onClick = {
                                         val id = notification.id
                                         val subjectId = notification.subjectID
@@ -179,11 +168,7 @@ fun NotificationScreen(navController: NavController) {
                                                     navController.navigate("add_to_order/$subjectId/$storeId")
                                                 }
                                             }
-                                            NotificationSubjectType.CLOSE -> {
-                                                if (subjectId != null) {
-                                                    navController.navigate("history_detail/$subjectId")
-                                                }
-                                            }
+                                            NotificationSubjectType.CLOSE,
                                             NotificationSubjectType.STOP -> {
                                                 if (subjectId != null) {
                                                     navController.navigate("history_detail/$subjectId")

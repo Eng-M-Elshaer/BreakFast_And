@@ -20,10 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import com.breakfast.designsystem.BreakfastOutlinedTextField
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,6 +52,8 @@ import com.breakfast.viewmodel.ProfileViewModel
 import java.io.ByteArrayOutputStream
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ArrowBack
+import com.breakfast.designsystem.BreakfastScreen
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.res.stringResource
 import com.breakfast.R
@@ -143,26 +143,21 @@ fun ProfileScreen(navController: NavController? = null, isPreview: Boolean = fal
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.personal_details)) },
-                actions = {
-                    IconButton(onClick = {
-                        val next = !isEditing.value
-                        isEditing.value = next
-                        showUpdate.value = next
-                    }) {
-                        Icon(imageVector = Icons.Filled.Edit, contentDescription = stringResource(R.string.edit))
-                    }
-                }
-            )
+    BreakfastScreen(
+        title = stringResource(R.string.personal_details),
+        rightAction = {
+            IconButton(onClick = {
+                val next = !isEditing.value
+                isEditing.value = next
+                showUpdate.value = next
+            }) {
+                Icon(imageVector = Icons.Filled.Edit, contentDescription = stringResource(R.string.edit))
+            }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .padding(paddingValues)
-            .padding(16.dp)
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
         ) {
             when (val state = profileState.value) {
                 is Result.Loading -> {
@@ -506,21 +501,18 @@ private fun ProfileContent(
 @Preview(showBackground = true, showSystemUi = true, name = "Profile – Preview")
 @Composable
 private fun ProfileScreenPreview() {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.personal_details)) },
-                actions = {
-                    IconButton(onClick = { /* simulate toggle */ }) {
-                        Icon(imageVector = Icons.Filled.Edit, contentDescription = stringResource(R.string.edit))
-                    }
-                }
-            )
+    BreakfastScreen(
+        title = stringResource(R.string.personal_details),
+        rightAction = {
+            IconButton(onClick = { /* simulate toggle */ }) {
+                Icon(imageVector = Icons.Filled.Edit, contentDescription = stringResource(R.string.edit))
+            }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .padding(paddingValues)
-            .padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+        ) {
             ProfileContent(
                 user = User(id = 64, name = "iOS Tester", email = "mail@mail.com", status = null, phone = "01000000000", profilePic = null),
                 isEditing = true,

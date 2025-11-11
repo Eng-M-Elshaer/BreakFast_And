@@ -13,12 +13,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,6 +41,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -98,6 +101,7 @@ fun ResetPasswordScreen(email: String, code: String, navController: NavControlle
                 viewModel.resetPassword(email, code, newPassword.value, confirmPassword.value)
             }
         },
+        onBack = { navController.popBackStack() },
         illustrationResId = null
     )
 
@@ -122,6 +126,7 @@ private fun ResetPasswordContent(
     onConfirmPasswordChange: (String) -> Unit,
     resetState: Result<*>?,
     onChangePassword: () -> Unit,
+    onBack: (() -> Unit)? = null,
     illustrationResId: Int? = null
 ) {
     var passwordVisible = remember { mutableStateOf(false) }
@@ -148,6 +153,31 @@ private fun ResetPasswordContent(
         confirmPasswordError == null
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier
+                    .statusBarsPadding(),
+                title = {
+                    Text(
+                        text = stringResource(id = com.breakfast.R.string.reset_password_title),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = colorResource(id = com.breakfast.R.color.woodsmoke),
+                    )
+                },
+                navigationIcon = {
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = null,
+                                tint = colorResource(id = com.breakfast.R.color.woodsmoke)
+                            )
+                        }
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -171,15 +201,6 @@ private fun ResetPasswordContent(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
-            // Title
-            Text(
-                text = stringResource(id = com.breakfast.R.string.reset_password_title),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(id = com.breakfast.R.color.woodsmoke),
-                modifier = Modifier.fillMaxWidth()
-            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -269,6 +290,7 @@ private fun ResetPasswordPreview() {
         onConfirmPasswordChange = { confirmPassword.value = it },
         resetState = state,
         onChangePassword = {},
+        onBack = null,
         illustrationResId = null
     )
 }

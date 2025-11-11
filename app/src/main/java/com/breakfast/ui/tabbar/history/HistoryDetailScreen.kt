@@ -9,14 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,6 +42,7 @@ import com.breakfast.designsystem.OrderInfoCard
 import com.breakfast.designsystem.TabChip
 import com.breakfast.managers.PreferenceManager
 import com.breakfast.ui.components.BreakfastEmptyState
+import com.breakfast.designsystem.BreakfastScreen
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -67,24 +62,15 @@ fun HistoryDetailScreen(
     }
 
     var showTable by remember { mutableStateOf(true) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.order_details)) },
-                navigationIcon = {
-                    IconButton(onClick = { navController?.popBackStack() }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
-                    }
-                }
-            )
-        }
+    BreakfastScreen(
+        title = stringResource(id = R.string.order_details),
+        onLeftAction = { navController?.popBackStack() }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(vertical = 8.dp)
         ) {
             when (val state = detailState) {
                 is Result.Loading -> {
@@ -94,10 +80,10 @@ fun HistoryDetailScreen(
                 }
                 is Result.Error -> {
                     BreakfastEmptyState(
-                        iconRes = com.breakfast.R.drawable.no_internet,
-                        title = state.message ?: stringResource(id = com.breakfast.R.string.failed_load_order_detail),
+                        iconRes = R.drawable.no_internet,
+                        title = state.message ?: stringResource(id = R.string.failed_load_order_detail),
                         showButton = true,
-                        buttonText = stringResource(id = com.breakfast.R.string.retry),
+                        buttonText = stringResource(id = R.string.retry),
                         onButtonClick = { viewModel.fetchHistoryDetail(orderId) },
                         modifier = Modifier
                             .weight(1f)
@@ -110,38 +96,38 @@ fun HistoryDetailScreen(
 
                     if (items.isEmpty()) {
                         BreakfastEmptyState(
-                            iconRes = com.breakfast.R.drawable.no_orders,
-                            title = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.no_items_in_order),
+                            iconRes = R.drawable.no_orders,
+                            title = stringResource(id = R.string.no_items_in_order),
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxWidth()
                         )
                     } else {
-                        // toggle row (Table / List)
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp, bottom = 16.dp)
-                                .clip(RoundedCornerShape(30.dp))
-                                .background(Color(0xFF0066FF)),
-                            verticalAlignment = Alignment.CenterVertically
+                                .height(48.dp)
+                                .background(
+                                    color = colorResource(R.color.blue_ribbon),
+                                    shape = RoundedCornerShape(999.dp)
+                                )
+                                .padding(4.dp)
                         ) {
                             TabChip(
-                                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.table),
+                                text = stringResource(id = R.string.table),
                                 selected = showTable,
-                                onClick = { showTable = true },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                onClick = { showTable = true }
                             )
                             TabChip(
-                                text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.list),
+                                text = stringResource(id = R.string.list),
                                 selected = !showTable,
-                                onClick = { showTable = false },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                onClick =  { showTable = false }
                             )
                         }
-
+                        Spacer(modifier = Modifier.height(8.dp))
                         if (showTable) {
-                            // header
                             CollectorTableHeader()
                             Column(
                                 modifier = Modifier
@@ -152,7 +138,10 @@ fun HistoryDetailScreen(
                                             bottomEnd = 20.dp
                                         )
                                     )
-                                    .background(colorResource(id = com.breakfast.R.color.background_grey), RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                                    .background(
+                                        colorResource(id = R.color.background_grey),
+                                        RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                                    )
                             ) {
                                 items.forEach { item ->
                                     Column(
@@ -187,9 +176,8 @@ fun HistoryDetailScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Order info card
                         OrderInfoCard(
-                            title = stringResource(id = com.breakfast.R.string.order_info),
+                            title = stringResource(id = R.string.order_info),
                             quantity = (detail?.count ?: 0).toString(),
                             tax = 0.0,
                             delivery = 0.0,
@@ -205,7 +193,7 @@ fun HistoryDetailScreen(
                             },
                             enabled = true,
                             isHasObserver = false,
-                            iconRes = com.breakfast.R.drawable.list_bullet_clipboard_fill,
+                            iconRes = R.drawable.list_bullet_clipboard_fill,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
@@ -281,28 +269,31 @@ private fun HistoryDetailPreviewContent(
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
         ) {
+            // Segmented
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 16.dp)
-                    .clip(RoundedCornerShape(30.dp))
-                    .background(Color(0xFF0066FF)),
-                verticalAlignment = Alignment.CenterVertically
+                    .height(48.dp)
+                    .background(
+                        color = colorResource(R.color.blue_ribbon),
+                        shape = RoundedCornerShape(999.dp)
+                    )
+                    .padding(4.dp)
             ) {
                 TabChip(
-                    text = "Table",
+                    text = stringResource(id = R.string.table),
                     selected = showTable,
-                    onClick = { showTable = true },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    onClick = { showTable = true }
                 )
                 TabChip(
-                    text = "List",
+                    text = stringResource(id = R.string.list),
                     selected = !showTable,
-                    onClick = { showTable = false },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    onClick =  { showTable = false }
                 )
             }
-
+            Spacer(modifier = Modifier.height(8.dp))
             if (showTable) {
                 Column(
                     modifier = Modifier

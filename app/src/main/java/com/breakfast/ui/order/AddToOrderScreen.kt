@@ -3,6 +3,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -24,6 +26,7 @@ import com.breakfast.utils.Result
 import com.breakfast.viewmodel.OrderViewModel
 import com.breakfast.R
 import com.breakfast.designsystem.BreakfastButtonRes
+import com.breakfast.designsystem.BreakfastScreen
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.platform.LocalContext
@@ -43,7 +46,8 @@ private fun AddToOrderScreenContent(
     orderItems: List<OrderModel>,
     onBack: () -> Unit = {},
     onSubmit: (selectedItem: StoreItemModel, quantity: Int, note: String, selectedUser: PersonModel?) -> Unit = { _,_,_,_ -> },
-    onDeleteItem: (Int) -> Unit = {}
+    onDeleteItem: (Int) -> Unit = {},
+    paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
     var selectedItem by remember { mutableStateOf<StoreItemModel?>(null) }
     var isItemsExpanded by remember { mutableStateOf(false) }
@@ -59,6 +63,7 @@ private fun AddToOrderScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .padding(paddingValues)
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(6.dp))
@@ -296,51 +301,42 @@ fun AddToOrderScreen(
         is Result.Success -> s.data.data ?: emptyList()
         else -> emptyList()
     }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.add_to_order)) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        val popped = navController?.popBackStack() ?: false
-                        if (!popped) {
-                            backDispatcher?.onBackPressed()
-                        }
-                    }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
-                    }
-                }
-            )
+    BreakfastScreen(
+        title = stringResource(id = R.string.add_to_order),
+        onLeftAction = {
+            val popped = navController?.popBackStack() ?: false
+            if (!popped) {
+                backDispatcher?.onBackPressed()
+            }
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            AddToOrderScreenContent(
-                itemsList = itemsList,
-                usersList = usersList,
-                orderItems = orderItems,
-                onBack = {
-                    val popped = navController?.popBackStack() ?: false
-                    if (!popped) {
-                        backDispatcher?.onBackPressed()
-                    }
-                },
-                onSubmit = { selectedItem, quantity, note, selectedUser ->
-                    val itemId = selectedItem.id ?: 0
-                    viewModel.addItem(
-                        orderId = orderId,
-                        itemId = if (itemId == 0) null else itemId,
-                        quantity = quantity,
-                        price = selectedItem.price,
-                        note = if (note.isBlank()) "" else note,
-                        userId = selectedUser?.id
-                    )
-                },
-                onDeleteItem = { itemId ->
-                    viewModel.removeOrderItem(itemId)
-                    orderId?.let { viewModel.fetchOrderItems(it) }
+        AddToOrderScreenContent(
+            itemsList = itemsList,
+            usersList = usersList,
+            orderItems = orderItems,
+            onBack = {
+                val popped = navController?.popBackStack() ?: false
+                if (!popped) {
+                    backDispatcher?.onBackPressed()
                 }
-            )
-        }
+            },
+            onSubmit = { selectedItem, quantity, note, selectedUser ->
+                val itemId = selectedItem.id ?: 0
+                viewModel.addItem(
+                    orderId = orderId,
+                    itemId = if (itemId == 0) null else itemId,
+                    quantity = quantity,
+                    price = selectedItem.price,
+                    note = if (note.isBlank()) "" else note,
+                    userId = selectedUser?.id
+                )
+            },
+            onDeleteItem = { itemId ->
+                viewModel.removeOrderItem(itemId)
+                orderId?.let { viewModel.fetchOrderItems(it) }
+            },
+            paddingValues = paddingValues
+        )
     }
 }
 
@@ -353,7 +349,8 @@ private fun AddToOrderScreenPreview() {
             usersList = emptyList(),
             orderItems = listOf(
                 OrderModel(id=1, orderID=10, itemName="Foul Sandwich", quantity=2, price=20.0, total=40.0, note="no onions", other = null)
-            )
+            ),
+            paddingValues = PaddingValues(0.dp)
         )
     }
 }
