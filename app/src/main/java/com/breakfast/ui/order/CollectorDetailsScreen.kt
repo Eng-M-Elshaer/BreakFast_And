@@ -57,6 +57,8 @@ import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.models.CustomItemPayload
 import com.breakfast.designsystem.CollectorOrderItemCard
 import com.breakfast.designsystem.CollectorTableHeader
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 /**
@@ -150,66 +152,73 @@ fun CollectorDetailsScreen(
             }
         }
     ) { paddingValues ->
-        CollectorDetailsContent(
-            state = collectorState,
-            onBack = {
-                val popped = navController?.popBackStack() ?: false
-                if (!popped) {
-                    backDispatcher?.onBackPressed()
-                }
-            },
-            onStopCollecting = {
-                val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
-                if (orderId != null) {
-                    viewModel.stopCollecteing(orderId)
-                }
-            },
-            onCloseCollecting = {
-                val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
-                if (orderId != null) {
-                    val tax = taxText.value.toDoubleOrNull() ?: 0.0
-                    val delivery = deliveryText.value.toDoubleOrNull() ?: 0.0
-                    val total = totalText.value.toDoubleOrNull() ?: 0.0
-                    viewModel.closeCollecting(orderId, tax, delivery, total)
-                }
-            },
-            showStoppedUi = isStoppedUi,
-            collectorTax = taxText.value,
-            collectorDelivery = deliveryText.value,
-            collectorTotal = totalText.value,
-            onTaxChange = {
-                taxText.value = it
-                taxError.value = if (it.isNotEmpty() && it.toDoubleOrNull() == null) {
-                    "Invalid number"
-                } else null
-            },
-            onDeliveryChange = {
-                deliveryText.value = it
-                deliveryError.value = if (it.isNotEmpty() && it.toDoubleOrNull() == null) {
-                    "Invalid number"
-                } else null
-            },
-            onTotalChange = { totalText.value = it },
-            onShowUsers = { users ->
-                selectedUsers.value = users
-                showUsersDialog.value = true
-            },
-            onCustomItemClick = { payload ->
-                // navigate with payload fields as query params
-                navController?.navigate(
-                    "custom_item?orderId=${payload.orderID}&name=${payload.name}&price=${payload.price}&quantity=${payload.quantity}&note=${payload.note}&storeId=${payload.storeID}&userId=${payload.userID}&orderItemId=${payload.orderItemID}"
-                )
-            },
-            onDismissUsers = { showUsersDialog.value = false },
-            showUsersDialog = showUsersDialog.value,
-            selectedUsers = selectedUsers.value,
-            collectorTaxError = taxError.value,
-            collectorDeliveryError = deliveryError.value,
-            onRetry = { viewModel.fetchCollectorItems() },
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
-        )
+        val isRefreshing = collectorState is Result.Loading
+        val swipeState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        SwipeRefresh(
+            state = swipeState,
+            onRefresh = { viewModel.fetchCollectorItems() }
+        ) {
+            CollectorDetailsContent(
+                state = collectorState,
+                onBack = {
+                    val popped = navController?.popBackStack() ?: false
+                    if (!popped) {
+                        backDispatcher?.onBackPressed()
+                    }
+                },
+                onStopCollecting = {
+                    val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
+                    if (orderId != null) {
+                        viewModel.stopCollecteing(orderId)
+                    }
+                },
+                onCloseCollecting = {
+                    val orderId = (collectorState as? com.breakfast.utils.Result.Success)?.data?.data?.order?.id
+                    if (orderId != null) {
+                        val tax = taxText.value.toDoubleOrNull() ?: 0.0
+                        val delivery = deliveryText.value.toDoubleOrNull() ?: 0.0
+                        val total = totalText.value.toDoubleOrNull() ?: 0.0
+                        viewModel.closeCollecting(orderId, tax, delivery, total)
+                    }
+                },
+                showStoppedUi = isStoppedUi,
+                collectorTax = taxText.value,
+                collectorDelivery = deliveryText.value,
+                collectorTotal = totalText.value,
+                onTaxChange = {
+                    taxText.value = it
+                    taxError.value = if (it.isNotEmpty() && it.toDoubleOrNull() == null) {
+                        "Invalid number"
+                    } else null
+                },
+                onDeliveryChange = {
+                    deliveryText.value = it
+                    deliveryError.value = if (it.isNotEmpty() && it.toDoubleOrNull() == null) {
+                        "Invalid number"
+                    } else null
+                },
+                onTotalChange = { totalText.value = it },
+                onShowUsers = { users ->
+                    selectedUsers.value = users
+                    showUsersDialog.value = true
+                },
+                onCustomItemClick = { payload ->
+                    // navigate with payload fields as query params
+                    navController?.navigate(
+                        "custom_item?orderId=${payload.orderID}&name=${payload.name}&price=${payload.price}&quantity=${payload.quantity}&note=${payload.note}&storeId=${payload.storeID}&userId=${payload.userID}&orderItemId=${payload.orderItemID}"
+                    )
+                },
+                onDismissUsers = { showUsersDialog.value = false },
+                showUsersDialog = showUsersDialog.value,
+                selectedUsers = selectedUsers.value,
+                collectorTaxError = taxError.value,
+                collectorDeliveryError = deliveryError.value,
+                onRetry = { viewModel.fetchCollectorItems() },
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(16.dp)
+            )
+        }
     }
 }
 

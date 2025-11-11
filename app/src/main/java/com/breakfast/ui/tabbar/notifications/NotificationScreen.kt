@@ -39,6 +39,8 @@ import androidx.navigation.NavController
 import com.breakfast.R
 import com.breakfast.models.NotificationSubjectType
 import com.breakfast.ui.components.BreakfastEmptyState
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -98,92 +100,99 @@ fun NotificationScreen(navController: NavController) {
             }
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
+        val isRefreshing = notificationsState.value is Result.Loading
+        val swipeState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        SwipeRefresh(
+            state = swipeState,
+            onRefresh = { viewModel.fetchNotifications() }
         ) {
-            when (val state = notificationsState.value) {
-                is Result.Loading -> {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                when (val state = notificationsState.value) {
+                    is Result.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
-                }
-                is Result.Error -> {
-                    BreakfastEmptyState(
-                        iconRes = R.drawable.no_internet,
-                        title = state.message ?: stringResource(id = R.string.failed_load_notifications),
-                        showButton = true,
-                        buttonText = stringResource(id = R.string.retry),
-                        onButtonClick = { viewModel.fetchNotifications() },
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                    )
-                }
-                is Result.Success -> {
-                    val itemsList = state.data.data ?: emptyList()
-                    if (itemsList.isEmpty()) {
+                    is Result.Error -> {
                         BreakfastEmptyState(
-                            iconRes = R.drawable.no_notification,
-                            title = stringResource(id = R.string.no_notifications),
+                            iconRes = R.drawable.no_internet,
+                            title = state.message ?: stringResource(id = R.string.failed_load_notifications),
+                            showButton = true,
+                            buttonText = stringResource(id = R.string.retry),
+                            onButtonClick = { viewModel.fetchNotifications() },
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxWidth()
                         )
-                    } else {
-                        LazyColumn(
-                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                                top = 0.dp,
-                                bottom = innerPadding.calculateBottomPadding()
+                    }
+                    is Result.Success -> {
+                        val itemsList = state.data.data ?: emptyList()
+                        if (itemsList.isEmpty()) {
+                            BreakfastEmptyState(
+                                iconRes = R.drawable.no_notification,
+                                title = stringResource(id = R.string.no_notifications),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
                             )
-                        ) {
-                            items(itemsList) { notification ->
-                                val isUnread = notification.isRead == true
-                                val title = notification.title ?: stringResource(id = R.string.notification)
-                                val subtitle = notification.message ?: ""
-                                val date = notification.createdAt ?: ""
-                                OrderCard(
-                                    title = title,
-                                    subtitle = subtitle,
-                                    date = date,
-                                    avatarUrl = null,
-                                    icon = if (isUnread) null else androidx.compose.material.icons.Icons.Filled.Circle,
-                                    avatarRes = R.drawable.circle_logo,
-                                    onClick = {
-                                        val id = notification.id
-                                        val subjectId = notification.subjectID
-                                        val storeId = notification.storeID
-                                        val type = notification.subjectType
-                                        if (isUnread) {
-                                            id?.let { viewModel.markNotificationAsRead(it) }
-                                        }
-                                        when (type) {
-                                            NotificationSubjectType.OPEN -> {
-                                                if (subjectId != null && storeId != null) {
-                                                    navController.navigate("add_to_order/$subjectId/$storeId")
-                                                }
-                                            }
-                                            NotificationSubjectType.CLOSE,
-                                            NotificationSubjectType.STOP -> {
-                                                if (subjectId != null) {
-                                                    navController.navigate("history_detail/$subjectId")
-                                                }
-                                            }
-                                            else -> {}
-                                        }
-                                    },
-                                    modifier = Modifier.padding(vertical = 6.dp)
+                        } else {
+                            LazyColumn(
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                    top = 0.dp,
+                                    bottom = innerPadding.calculateBottomPadding()
                                 )
+                            ) {
+                                items(itemsList) { notification ->
+                                    val isUnread = notification.isRead == true
+                                    val title = notification.title ?: stringResource(id = R.string.notification)
+                                    val subtitle = notification.message ?: ""
+                                    val date = notification.createdAt ?: ""
+                                    OrderCard(
+                                        title = title,
+                                        subtitle = subtitle,
+                                        date = date,
+                                        avatarUrl = null,
+                                        icon = if (isUnread) null else androidx.compose.material.icons.Icons.Filled.Circle,
+                                        avatarRes = R.drawable.circle_logo,
+                                        onClick = {
+                                            val id = notification.id
+                                            val subjectId = notification.subjectID
+                                            val storeId = notification.storeID
+                                            val type = notification.subjectType
+                                            if (isUnread) {
+                                                id?.let { viewModel.markNotificationAsRead(it) }
+                                            }
+                                            when (type) {
+                                                NotificationSubjectType.OPEN -> {
+                                                    if (subjectId != null && storeId != null) {
+                                                        navController.navigate("add_to_order/$subjectId/$storeId")
+                                                    }
+                                                }
+                                                NotificationSubjectType.CLOSE,
+                                                NotificationSubjectType.STOP -> {
+                                                    if (subjectId != null) {
+                                                        navController.navigate("history_detail/$subjectId")
+                                                    }
+                                                }
+                                                else -> {}
+                                            }
+                                        },
+                                        modifier = Modifier.padding(vertical = 6.dp)
+                                    )
+                                }
                             }
                         }
                     }
+                    else -> {}
                 }
-                else -> {}
             }
         }
         ErrorDialog(

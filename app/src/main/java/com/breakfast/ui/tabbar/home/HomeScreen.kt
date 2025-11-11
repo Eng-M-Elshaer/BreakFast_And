@@ -40,6 +40,8 @@ import com.breakfast.ui.components.SelectStoreDialog
 import com.breakfast.models.StoreModel
 import com.breakfast.ui.components.BreakfastEmptyState
 import com.google.android.datatransport.BuildConfig
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -117,116 +119,123 @@ fun HomeScreen(navController: NavController? = null) {
     BreakfastScreen(
         title = stringResource(id = R.string.home_screen_title)
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
+        val isRefreshing = homeState.value is Result.Loading
+        val swipeState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        SwipeRefresh(
+            state = swipeState,
+            onRefresh = { viewModel.fetchHome() }
         ) {
-            when (val state = homeState.value) {
-                is Result.Loading -> {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                when (val state = homeState.value) {
+                    is Result.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
-                }
-                is Result.Error -> {
-                    BreakfastEmptyState(
-                        iconRes = R.drawable.no_internet,
-                        title = state.message ?: stringResource(id = R.string.failed_load_home),
-                        showButton = true,
-                        buttonText = stringResource(id = R.string.retry),
-                        onButtonClick = { viewModel.fetchHome() },
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(12.dp))
-                }
-                is Result.Success -> {
-                    val itemsList: List<HomeModel> = state.data.data ?: emptyList()
-                    val hasMyCollect = itemsList.any { item ->
-                        val collectorId = item.collector?.id
-                        collectorId != null && myId != null && collectorId == myId
-                    }
-                    val myCollectOrder = itemsList.firstOrNull { item ->
-                        val collectorId = item.collector?.id
-                        collectorId != null && myId != null && collectorId == myId
-                    }
-
-                    if (itemsList.isEmpty()) {
+                    is Result.Error -> {
                         BreakfastEmptyState(
-                            iconRes = R.drawable.no_orders,
-                            title = stringResource(id = R.string.no_orders_available),
+                            iconRes = R.drawable.no_internet,
+                            title = state.message ?: stringResource(id = R.string.failed_load_home),
+                            showButton = true,
+                            buttonText = stringResource(id = R.string.retry),
+                            onButtonClick = { viewModel.fetchHome() },
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxWidth()
                         )
                         Spacer(Modifier.height(12.dp))
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth(),
-                            contentPadding = PaddingValues(vertical = 8.dp)
-                        ) {
-                            items(itemsList) { homeItem ->
-                                val title = homeItem.collector?.name
-                                    ?: (stringResource(id = R.string.order) + " #${homeItem.id ?: ""}")
-                                val subtitle = if (homeItem.store?.name != null) homeItem.store.name
-                                else (stringResource(id = R.string.status) + ": ${homeItem.status?.name ?: ""}")
+                    }
+                    is Result.Success -> {
+                        val itemsList: List<HomeModel> = state.data.data ?: emptyList()
+                        val hasMyCollect = itemsList.any { item ->
+                            val collectorId = item.collector?.id
+                            collectorId != null && myId != null && collectorId == myId
+                        }
+                        val myCollectOrder = itemsList.firstOrNull { item ->
+                            val collectorId = item.collector?.id
+                            collectorId != null && myId != null && collectorId == myId
+                        }
 
-                                OrderCard(
-                                    title = title,
-                                    subtitle = subtitle,
-                                    onClick = {
-                                        navController?.let { controller ->
-                                            val orderId = homeItem.id ?: 0
-                                            val storeId = homeItem.store?.id ?: 0
-                                            controller.navigate("add_to_order/${orderId}/${storeId}")
-                                        }
-                                    },
-                                    avatarUrl = homeItem.store?.image,
-                                    modifier = Modifier.padding(vertical = 6.dp)
-                                )
+                        if (itemsList.isEmpty()) {
+                            BreakfastEmptyState(
+                                iconRes = R.drawable.no_orders,
+                                title = stringResource(id = R.string.no_orders_available),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                            )
+                            Spacer(Modifier.height(12.dp))
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth(),
+                                contentPadding = PaddingValues(vertical = 8.dp)
+                            ) {
+                                items(itemsList) { homeItem ->
+                                    val title = homeItem.collector?.name
+                                        ?: (stringResource(id = R.string.order) + " #${homeItem.id ?: ""}")
+                                    val subtitle = if (homeItem.store?.name != null) homeItem.store.name
+                                    else (stringResource(id = R.string.status) + ": ${homeItem.status?.name ?: ""}")
+
+                                    OrderCard(
+                                        title = title,
+                                        subtitle = subtitle,
+                                        onClick = {
+                                            navController?.let { controller ->
+                                                val orderId = homeItem.id ?: 0
+                                                val storeId = homeItem.store?.id ?: 0
+                                                controller.navigate("add_to_order/${orderId}/${storeId}")
+                                            }
+                                        },
+                                        avatarUrl = homeItem.store?.image,
+                                        modifier = Modifier.padding(vertical = 6.dp)
+                                    )
+                                }
                             }
                         }
-                    }
-                    if (hasMyCollect) {
-                        BreakfastButtonRes(
-                            onClick = {
-                                myCollectOrder?.let { order ->
-                                    navController?.navigate("collector_details")
-                                }
-                            },
-                            enabled = true,
-                            isHasObserver = false,
-                            iconRes = R.drawable.list_bullet_clipboard_fill,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            Text(text = stringResource(R.string.start_collecting))
+                        if (hasMyCollect) {
+                            BreakfastButtonRes(
+                                onClick = {
+                                    myCollectOrder?.let { order ->
+                                        navController?.navigate("collector_details")
+                                    }
+                                },
+                                enabled = true,
+                                isHasObserver = false,
+                                iconRes = R.drawable.list_bullet_clipboard_fill,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text(text = stringResource(R.string.start_collecting))
+                            }
+                        } else {
+                            BreakfastButtonRes(
+                                onClick = {
+                                    viewModel.fetchStores()
+                                    pendingStoreDialog.value = true
+                                },
+                                enabled = true,
+                                isHasObserver = false,
+                                iconRes = R.drawable.list_bullet_clipboard_fill,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                Text(text = stringResource(R.string.be_a_collector))
+                            }
                         }
-                    } else {
-                        BreakfastButtonRes(
-                            onClick = {
-                                viewModel.fetchStores()
-                                pendingStoreDialog.value = true
-                            },
-                            enabled = true,
-                            isHasObserver = false,
-                            iconRes = R.drawable.list_bullet_clipboard_fill,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            Text(text = stringResource(R.string.be_a_collector))
-                        }
+                        Spacer(Modifier.height(8.dp))
                     }
-                    Spacer(Modifier.height(8.dp))
                 }
             }
         }

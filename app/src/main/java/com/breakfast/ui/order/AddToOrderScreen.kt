@@ -37,6 +37,8 @@ import com.breakfast.designsystem.CollectorTableHeader
 import com.breakfast.designsystem.CollectorOrderItemCard
 import com.breakfast.designsystem.CollectorOrderDisplayItem
 import com.breakfast.models.OrderModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -310,33 +312,43 @@ fun AddToOrderScreen(
             }
         }
     ) { paddingValues ->
-        AddToOrderScreenContent(
-            itemsList = itemsList,
-            usersList = usersList,
-            orderItems = orderItems,
-            onBack = {
-                val popped = navController?.popBackStack() ?: false
-                if (!popped) {
-                    backDispatcher?.onBackPressed()
-                }
-            },
-            onSubmit = { selectedItem, quantity, note, selectedUser ->
-                val itemId = selectedItem.id ?: 0
-                viewModel.addItem(
-                    orderId = orderId,
-                    itemId = if (itemId == 0) null else itemId,
-                    quantity = quantity,
-                    price = selectedItem.price,
-                    note = if (note.isBlank()) "" else note,
-                    userId = selectedUser?.id
-                )
-            },
-            onDeleteItem = { itemId ->
-                viewModel.removeOrderItem(itemId)
+        val isRefreshing = (storeItemsState is Result.Loading) || (orderItemsState is Result.Loading)
+        val swipeState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        SwipeRefresh(
+            state = swipeState,
+            onRefresh = {
+                viewModel.fetchStoreItems(storeId)
                 orderId?.let { viewModel.fetchOrderItems(it) }
-            },
-            paddingValues = paddingValues
-        )
+            }
+        ) {
+            AddToOrderScreenContent(
+                itemsList = itemsList,
+                usersList = usersList,
+                orderItems = orderItems,
+                onBack = {
+                    val popped = navController?.popBackStack() ?: false
+                    if (!popped) {
+                        backDispatcher?.onBackPressed()
+                    }
+                },
+                onSubmit = { selectedItem, quantity, note, selectedUser ->
+                    val itemId = selectedItem.id ?: 0
+                    viewModel.addItem(
+                        orderId = orderId,
+                        itemId = if (itemId == 0) null else itemId,
+                        quantity = quantity,
+                        price = selectedItem.price,
+                        note = if (note.isBlank()) "" else note,
+                        userId = selectedUser?.id
+                    )
+                },
+                onDeleteItem = { itemId ->
+                    viewModel.removeOrderItem(itemId)
+                    orderId?.let { viewModel.fetchOrderItems(it) }
+                },
+                paddingValues = paddingValues
+            )
+        }
     }
 }
 

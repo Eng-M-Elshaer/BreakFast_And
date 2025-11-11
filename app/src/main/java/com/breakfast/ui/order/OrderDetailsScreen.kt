@@ -51,6 +51,8 @@ import com.breakfast.network.ApiClient
 import com.breakfast.ui.components.BreakfastEmptyState
 import com.breakfast.utils.Result
 import com.breakfast.viewmodel.OrderViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -165,12 +167,18 @@ fun OrderDetailsScreen(
             }
         }
     ){ paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
+        val isRefreshing = collectorState.value is Result.Loading
+        val swipeState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        SwipeRefresh(
+            state = swipeState,
+            onRefresh = { viewModel?.fetchCollectorHistoryItems(orderId) }
         ) {
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
             Spacer(Modifier.height(12.dp))
 
             // Segmented
@@ -254,6 +262,7 @@ fun OrderDetailsScreen(
                 }
 
                 null -> Unit
+            }
             }
         }
     }
