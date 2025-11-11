@@ -17,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+ 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.breakfast.ui.tabbar.notifications.NotificationScreen
@@ -44,6 +46,11 @@ import androidx.compose.ui.res.colorResource
 import com.breakfast.R
 import com.breakfast.models.CustomItemPayload
 import com.breakfast.ui.order.CustomItemScreen
+import android.app.Activity
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+import com.breakfast.notifications.NotificationNavRouter
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * Represents each tab in the bottom navigation bar with its route, icon and label.
@@ -131,6 +138,8 @@ private fun BreakfastBottomBar(
 fun MainScreen(rootNavController: NavController? = null) {
 
     val navController = rememberNavController()
+    val context = LocalContext.current
+    val activity = context as? Activity
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Notifications,
@@ -159,6 +168,21 @@ fun MainScreen(rootNavController: NavController? = null) {
             }
         }
     ) { innerPadding ->
+        // Consume initial intent extras once at startup
+        LaunchedEffect(Unit) {
+            val extras = activity?.intent?.extras
+            if (extras != null && !extras.isEmpty) {
+                handleNotificationExtras(navController, extras)
+                // clear to avoid re-navigation on config changes
+                activity?.intent?.replaceExtras(android.os.Bundle())
+            }
+        }
+        // Handle new intents while app is running
+        LaunchedEffect(Unit) {
+            NotificationNavRouter.events.collectLatest { extras ->
+                handleNotificationExtras(navController, extras)
+            }
+        }
         NavHost(
             navController,
             startDestination = BottomNavItem.Home.route,
@@ -265,6 +289,36 @@ fun MainScreen(rootNavController: NavController? = null) {
     }
 }
 
+private fun handleNotificationExtras(navController: NavController, extras: android.os.Bundle) {
+    val target = extras.getString("nav_target") ?: return
+    when (target) {
+        "add_to_order" -> {
+            val orderId = extras.getInt("orderId", 0)
+            val storeId = extras.getInt("storeId", 0)
+            if (orderId > 0) {
+                navController.navigate("add_to_order/$orderId/$storeId")
+            }
+        }
+        "history" -> {
+            val orderId = extras.getInt("orderId", 0)
+            if (orderId > 0) {
+                navController.navigate("history_detail/$orderId")
+            }
+        }
+        "home" -> {
+            navController.navigate(BottomNavItem.Home.route) {
+                popUpTo(navController.graph.findStartDestination().id) { inclusive = false }
+                launchSingleTop = true
+            }
+        }
+        "notifications" -> {
+            navController.navigate(BottomNavItem.Notifications.route) {
+                popUpTo(navController.graph.findStartDestination().id) { inclusive = false }
+                launchSingleTop = true
+            }
+        }
+    }
+}
 @Preview(showBackground = true, showSystemUi = true, name = "MainScreen Preview")
 @Composable
 private fun MainScreenPreview() {

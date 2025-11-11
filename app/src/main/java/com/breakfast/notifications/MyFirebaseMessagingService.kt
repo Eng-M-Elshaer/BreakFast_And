@@ -5,6 +5,7 @@ import com.breakfast.managers.PreferenceManager
 import com.breakfast.ui.tabbar.notifications.NotificationHandler
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import android.os.Bundle
 
 /**
  * Firebase Cloud Messaging service that handles incoming push notifications
@@ -26,9 +27,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         val prefs = PreferenceManager(applicationContext)
         prefs.saveFcmToken(token)
-
-        // TODO: Send token to your backend server if needed
-        // sendTokenToServer(token)
     }
 
     /**
@@ -44,7 +42,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             notificationHandler.showNotification(
                 title = notification.title,
                 body = notification.body,
-                imageUrl = notification.imageUrl?.toString()
+                imageUrl = null
             )
         }
 
@@ -61,22 +59,86 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      */
     private fun handleDataPayload(data: Map<String, String>) {
         // Example: Handle different notification types
-        when (data["type"]) {
-            "order_update" -> {
-                val orderId = data["order_id"]
-                val status = data["status"]
-                notificationHandler.showOrderNotification(orderId, status)
+        when (data["subject_type"]) {
+            "order_opened" -> {
+                val orderId = (data["order_id"] ?: data["orderId"] ?: data["store_id"] ?: "0")
+                val storeId = (data["store_id"] ?: data["storeId"] ?: "0")
+                val extras = Bundle().apply {
+                    putString("nav_target", "add_to_order")
+                    putInt("orderId", orderId.toIntOrNull() ?: 0)
+                    putInt("storeId", storeId.toIntOrNull() ?: 0)
+                }
+                notificationHandler.showNotification(
+                    title = "Order Update",
+                    body = "Order #$orderId opened",
+                    channelId = "breakfast_orders",
+                    routeExtras = extras
+                )
+            }
+            "order_stoped" -> {
+                val extras = Bundle().apply {
+                    putString("nav_target", "home")
+                }
+                notificationHandler.showNotification(
+                    title = "Order Update",
+                    body = "An order has been stopped",
+                    channelId = "breakfast_orders",
+                    routeExtras = extras
+                )
+            }
+            "order_reopened" -> {
+                val orderId = (data["order_id"] ?: data["orderId"] ?: data["store_id"] ?: "0")
+                val storeId = (data["store_id"] ?: data["storeId"] ?: "0")
+                val extras = Bundle().apply {
+                    putString("nav_target", "add_to_order")
+                    putInt("orderId", orderId.toIntOrNull() ?: 0)
+                    putInt("storeId", storeId.toIntOrNull() ?: 0)
+                }
+                notificationHandler.showNotification(
+                    title = "Order Update",
+                    body = "Order #$orderId reopened",
+                    channelId = "breakfast_orders",
+                    routeExtras = extras
+                )
+            }
+            "order_closed" -> {
+                val orderId = (data["order_id"] ?: data["orderId"] ?: "0")
+                val extras = Bundle().apply {
+                    putString("nav_target", "history")
+                    putInt("orderId", orderId.toIntOrNull() ?: 0)
+                }
+                notificationHandler.showNotification(
+                    title = "Order Update",
+                    body = "Order #$orderId closed",
+                    channelId = "breakfast_orders",
+                    routeExtras = extras
+                )
             }
             "promotion" -> {
                 val title = data["title"]
                 val message = data["message"]
-                notificationHandler.showPromotionNotification(title, message)
+                val extras = Bundle().apply {
+                    putString("nav_target", "notifications")
+                }
+                notificationHandler.showNotification(
+                    title = title ?: "Special Offer",
+                    body = message,
+                    channelId = "breakfast_promotions",
+                    routeExtras = extras
+                )
             }
             else -> {
                 // Default notification
+                val title = data["title"]
+                val message = data["message"]
+                val extras = Bundle().apply {
+                    putString("nav_target", "notifications")
+                }
                 notificationHandler.showNotification(
-                    title = data["title"],
-                    body = data["message"]
+                    title = title,
+                    body = message,
+                    channelId = "breakfast_general",
+                    routeExtras = extras
                 )
             }
         }

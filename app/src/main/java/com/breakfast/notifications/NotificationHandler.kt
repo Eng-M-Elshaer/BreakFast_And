@@ -13,6 +13,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -92,7 +93,8 @@ class NotificationHandler(private val context: Context) {
         title: String?,
         body: String?,
         imageUrl: String? = null,
-        channelId: String = CHANNEL_GENERAL
+        channelId: String = CHANNEL_GENERAL,
+        routeExtras: Bundle? = null
     ) {
         if (!hasNotificationPermission()) {
             Log.w(TAG, "POST_NOTIFICATIONS permission not granted")
@@ -100,7 +102,10 @@ class NotificationHandler(private val context: Context) {
         }
 
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            if (routeExtras != null) {
+                putExtras(routeExtras)
+            }
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -119,21 +124,29 @@ class NotificationHandler(private val context: Context) {
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
 
-        // Load and set image if provided
-        imageUrl?.let { url ->
+        // Load and set image if provided, otherwise fallback to local drawable
+        if (imageUrl != null) {
             try {
-                val bitmap = loadImageFromUrl(url)
-                bitmap?.let {
+                val bitmap = loadImageFromUrl(imageUrl)
+                if (bitmap != null) {
                     builder.setStyle(
                         NotificationCompat.BigPictureStyle()
-                            .bigPicture(it)
-                            .bigLargeIcon(null as Bitmap?) // Hide large icon when expanded
+                            .bigPicture(bitmap)
+                            .bigLargeIcon(null as Bitmap?)
                     )
-                    builder.setLargeIcon(it)
+                    builder.setLargeIcon(bitmap)
+                } else {
+                    val fallback = BitmapFactory.decodeResource(context.resources, R.drawable.circle_logo)
+                    builder.setLargeIcon(fallback)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to load notification image", e)
+                val fallback = BitmapFactory.decodeResource(context.resources, R.drawable.circle_logo)
+                builder.setLargeIcon(fallback)
             }
+        } else {
+            val fallback = BitmapFactory.decodeResource(context.resources, R.drawable.circle_logo)
+            builder.setLargeIcon(fallback)
         }
 
         val notificationId = generateNotificationId()

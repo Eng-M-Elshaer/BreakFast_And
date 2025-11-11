@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.lifecycle.lifecycleScope
 import com.breakfast.ui.navigation.BreakfastNavGraph
 import com.breakfast.ui.tabbar.notifications.NotificationHandler
+import com.breakfast.notifications.NotificationNavRouter
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -55,6 +56,14 @@ class MainActivity : ComponentActivity() {
                     BreakfastNavGraph()
                 }
             }
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent?) {
+        super.onNewIntent(intent)
+        val extras = intent?.extras
+        if (extras != null && !extras.isEmpty) {
+            NotificationNavRouter.dispatch(extras)
         }
     }
 }
