@@ -123,7 +123,11 @@ fun NotificationScreen(navController: NavController) {
                     }
                     is Result.Error -> {
                         BreakfastEmptyState(
-                            iconRes = R.drawable.no_internet,
+                            iconRes = if (state.message == stringResource(com.breakfast.R.string.no_internet)) {
+                                com.breakfast.R.drawable.no_internet
+                            } else {
+                                com.breakfast.R.drawable.ic_error_round
+                            },
                             title = state.message ?: stringResource(id = R.string.failed_load_notifications),
                             showButton = true,
                             buttonText = stringResource(id = R.string.retry),

@@ -15,18 +15,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,7 +40,6 @@ import com.breakfast.ui.components.BreakfastEmptyState
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -251,14 +245,18 @@ private fun CollectorDetailsContent(
             .fillMaxWidth()
             .verticalScroll(scrollState)
     ) {
-        when (val s = state) {
+        when (val state = state) {
             is Result.Loading -> {
                 CircularProgressIndicator()
             }
             is Result.Error -> {
                 BreakfastEmptyState(
-                    iconRes = R.drawable.no_internet,
-                    title = s.message ?: stringResource(id = R.string.failed_load_collector),
+                    iconRes = if (state.message == stringResource(com.breakfast.R.string.no_internet)) {
+                        com.breakfast.R.drawable.no_internet
+                    } else {
+                        com.breakfast.R.drawable.ic_error_round
+                    },
+                    title = state.message ?: stringResource(id = R.string.failed_load_collector),
                     showButton = true,
                     buttonText = stringResource(id = R.string.retry),
                     onButtonClick = onRetry,
@@ -268,7 +266,7 @@ private fun CollectorDetailsContent(
                 )
             }
             is Result.Success -> {
-                val data = s.data.data
+                val data = state.data.data
                 if (data == null || (data.orderItems.isNullOrEmpty() && data.customOrderItems.isNullOrEmpty())) {
                     BreakfastEmptyState(
                         iconRes = R.drawable.no_orders,

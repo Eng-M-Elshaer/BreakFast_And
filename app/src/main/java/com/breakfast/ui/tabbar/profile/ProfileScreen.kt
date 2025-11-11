@@ -172,7 +172,11 @@ fun ProfileScreen(navController: NavController? = null, isPreview: Boolean = fal
                 }
                 is Result.Error -> {
                     BreakfastEmptyState(
-                        iconRes = com.breakfast.R.drawable.no_internet,
+                        iconRes = if (state.message == stringResource(com.breakfast.R.string.no_internet)) {
+                            com.breakfast.R.drawable.no_internet
+                        } else {
+                            com.breakfast.R.drawable.ic_error_round
+                        },
                         title = state.message ?: stringResource(id = com.breakfast.R.string.something_went_wrong),
                         showButton = true,
                         buttonText = stringResource(id = com.breakfast.R.string.retry),
