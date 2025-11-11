@@ -11,7 +11,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.IOException
 
 object ApiClient {
-    private const val BASE_URL = "https://breakfast.restart-technology.com/api/"
+    private const val BASE_URL = "https://breakfast.restart-technology.com/api/v1/"
 
     // Token interceptor to add authorization headers
     // A provider function that supplies the current auth token. This will be set from your
