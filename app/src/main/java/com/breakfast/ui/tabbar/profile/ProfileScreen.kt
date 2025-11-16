@@ -189,9 +189,9 @@ fun ProfileScreen(navController: NavController? = null, isPreview: Boolean = fal
                 is Result.Success<*> -> {
                     val user: User = when (val payload = state.data) {
                         is User -> payload
-                        is UserModel -> payload.user ?: User(null, null, null, null, null, null)
-                        is ApiResponse<*> -> (payload.data as? UserModel)?.user ?: User(null, null, null, null, null, null)
-                        else -> User(null, null, null, null, null, null)
+                        is UserModel -> payload.user ?: User(null, null, null, null, null, null, instaPay = null)
+                        is ApiResponse<*> -> (payload.data as? UserModel)?.user ?: User(null, null, null, null, null, null, instaPay = null)
+                        else -> User(null, null, null, null, null, null, instaPay = null)
                     }
                     ProfileContent(
                         user = user,
@@ -199,7 +199,7 @@ fun ProfileScreen(navController: NavController? = null, isPreview: Boolean = fal
                         showUpdate = showUpdate.value,
                         updateState = updateState.value,
                         avatarState = avatarState.value,
-                        onUpdate = { n, p, e -> viewModel.updateProfile(n, p, e) },
+                        onUpdate = { n, p, e, i -> viewModel.updateProfile(n, p, e, instaPay = i) },
                         onChangePassword = { navController?.navigate("change_password") },
                         onLogout = { viewModel.logout() },
                         onPickOrCapture = { bytes -> uploadAvatar(bytes) },
@@ -252,7 +252,7 @@ private fun ProfileContent(
     showUpdate: Boolean,
     updateState: Result<*>?,
     avatarState: Result<*>?,
-    onUpdate: (name: String, phone: String, email: String) -> Unit,
+    onUpdate: (name: String, phone: String, email: String, instaPay: String?) -> Unit,
     onChangePassword: () -> Unit,
     onLogout: () -> Unit,
     onPickOrCapture: (ByteArray) -> Unit,
@@ -261,11 +261,13 @@ private fun ProfileContent(
     val nameState = remember { mutableStateOf(user.name ?: "") }
     val phoneState = remember { mutableStateOf(user.phone ?: "") }
     val emailState = remember { mutableStateOf(user.email ?: "") }
+    val instaPayState = remember { mutableStateOf(user.instaPay ?: "") }
 
     // Touched flags for showing errors only after user interaction
     val nameTouched = remember { mutableStateOf(false) }
     val phoneTouched = remember { mutableStateOf(false) }
     val emailTouched = remember { mutableStateOf(false) }
+    val instaPayTouched = remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val showPicker = remember { mutableStateOf(false) }
@@ -314,7 +316,11 @@ private fun ProfileContent(
     val originalName = remember(user) { user.name ?: "" }
     val originalPhone = remember(user) { user.phone ?: "" }
     val originalEmail = remember(user) { user.email ?: "" }
-    val isDirty = (nameState.value != originalName) || (phoneState.value != originalPhone) || (emailState.value != originalEmail)
+    val originalInstaPay = remember(user) { user.instaPay ?: "" }
+    val isDirty = (nameState.value != originalName) ||
+        (phoneState.value != originalPhone) ||
+        (emailState.value != originalEmail) ||
+        (instaPayState.value != originalInstaPay)
 
     // Avatar
     Box(
@@ -439,6 +445,23 @@ private fun ProfileContent(
             .padding(top = 8.dp)
     )
 
+    BreakfastOutlinedTextField(
+        value = instaPayState.value,
+        onValueChange = {
+            if (!instaPayTouched.value) instaPayTouched.value = true
+            instaPayState.value = it
+        },
+        label = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.instaPay_link),
+        isError = instaPayTouched.value && instaPayState.value.isNotBlank() && !Validator.isValidInstaPayLink(instaPayState.value),
+        errorText = if (instaPayTouched.value && instaPayState.value.isNotBlank() && !Validator.isValidInstaPayLink(instaPayState.value)) {
+            androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.instapay_link_invaild)
+        } else null,
+        enabled = isEditing,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+    )
+
     if (updateState is Result.Loading) {
         CircularProgressIndicator(modifier = Modifier.padding(top = 8.dp))
     }
@@ -455,13 +478,15 @@ private fun ProfileContent(
         Text(text = androidx.compose.ui.res.stringResource(id = com.breakfast.R.string.change_password_button))
     }
 
+    val instaOptionalValid = instaPayState.value.isBlank() || Validator.isValidInstaPayLink(instaPayState.value)
     val allValid = Validator.isValidFullName(nameState.value) &&
         Validator.isValidEgyptianPhoneNumber(phoneState.value) &&
-        Validator.isValidEmail(emailState.value)
+        Validator.isValidEmail(emailState.value) &&
+        instaOptionalValid
     if (isEditing && showUpdate) {
         val canUpdate = allValid && isDirty
         BreakfastButtonRes(
-            onClick = { onUpdate(nameState.value.trim(), phoneState.value.trim(), emailState.value.trim()) },
+            onClick = { onUpdate(nameState.value.trim(), phoneState.value.trim(), emailState.value.trim(), instaPayState.value.trim().ifBlank { null }) },
             enabled = canUpdate,
             isHasObserver = !canUpdate,
             modifier = Modifier
@@ -518,12 +543,12 @@ private fun ProfileScreenPreview() {
                 .padding(paddingValues)
         ) {
             ProfileContent(
-                user = User(id = 64, name = "iOS Tester", email = "mail@mail.com", status = null, phone = "01000000000", profilePic = null),
+                user = User(id = 64, name = "iOS Tester", email = "mail@mail.com", status = null, phone = "01000000000", profilePic = null, instaPay = null),
                 isEditing = true,
                 showUpdate = true,
                 updateState = null,
                 avatarState = null,
-                onUpdate = { _, _, _ -> },
+                onUpdate = { _, _, _ , _-> },
                 onChangePassword = {},
                 onLogout = {},
                 onPickOrCapture = {},

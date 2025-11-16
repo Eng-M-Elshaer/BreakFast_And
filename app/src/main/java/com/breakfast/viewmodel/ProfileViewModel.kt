@@ -44,10 +44,10 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
     /**
      * Update the user's name, phone and email.
      */
-    fun updateProfile(name: String, phone: String, email: String) {
+    fun updateProfile(name: String, phone: String, email: String, instaPay: String?) {
         viewModelScope.launch {
             _updateState.value = Result.Loading
-            val result = repository.updateProfile(name, phone, email)
+            val result = repository.updateProfile(name, phone, email, instaPay)
             _updateState.value = result
         }
     }

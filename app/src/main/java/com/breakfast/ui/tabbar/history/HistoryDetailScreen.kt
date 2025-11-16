@@ -1,3 +1,20 @@
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
+import coil.compose.AsyncImage
+import com.breakfast.utils.Validator
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -180,6 +197,22 @@ fun HistoryDetailScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        if (detail?.order?.collector?.id != myId) {
+                            val collectorName = detail?.order?.collector?.name
+                            val collectorImage = detail?.order?.collector?.image
+                            val collectorPhone = detail?.order?.collector?.phone
+                            val collectorInstaPay = detail?.order?.collector?.instaPay
+
+                            CollectorInfoCard(
+                                name = collectorName,
+                                phone = collectorPhone,
+                                instaPay = collectorInstaPay,
+                                imageUrl = collectorImage,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 12.dp)
+                            )
+                        }
                         OrderInfoCard(
                             title = stringResource(id = R.string.order_info),
                             quantity = (detail?.count ?: 0).toString(),
@@ -207,6 +240,89 @@ fun HistoryDetailScreen(
                     }
                 }
                 else -> {}
+            }
+        }
+    }
+}
+
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+private fun CollectorInfoCard(
+    name: String?,
+    phone: String?,
+    instaPay: String?,
+    imageUrl: String?,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.card_bg))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                placeholder = painterResource(id = R.drawable.image_placeholder),
+                error = painterResource(id = R.drawable.image_placeholder),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(CircleShape)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                if (!name.isNullOrBlank()) {
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colorResource(id = R.color.woodsmoke)
+                    )
+                }
+                if (!phone.isNullOrBlank()) {
+                    Text(
+                        text = phone,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorResource(id = R.color.blue_ribbon),
+                        modifier = Modifier.combinedClickable(
+                            onClick = {
+                                val dial = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
+                                dial.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                runCatching { context.startActivity(dial) }
+                            },
+                            onLongClick = {
+                                clipboard.setText(AnnotatedString(phone))
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.copied),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        )
+                    )
+                }
+                if (!instaPay.isNullOrBlank()) {
+                    val valid = runCatching { Validator.isValidInstaPayLink(instaPay) }.getOrDefault(false)
+                    if (valid) {
+                        Text(
+                            text = stringResource(R.string.pay_via_instapay),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = colorResource(id = R.color.blue_ribbon),
+                            modifier = Modifier.clickable {
+                                val view = Intent(Intent.ACTION_VIEW, Uri.parse(instaPay))
+                                view.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                runCatching { context.startActivity(view) }
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -311,7 +427,10 @@ private fun HistoryDetailPreviewContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-                        .background(colorResource(id = com.breakfast.R.color.background_grey), RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                        .background(
+                            colorResource(id = com.breakfast.R.color.background_grey),
+                            RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                        )
                 ) {
                     items.forEach { item ->
                         Column(

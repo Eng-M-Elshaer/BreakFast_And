@@ -155,16 +155,16 @@ private fun HistoryWithDataPreview() {
         HistoryModel(
             id = 101,
             status = null,
-            store = com.breakfast.models.Collector(name = "عم حسن", id = 1, image = null),
-            collector = com.breakfast.models.Collector(name = "iOS Tester", id = 64, image = null),
+            store = com.breakfast.models.Collector(name = "عم حسن", id = 1, image = null, phone = "01000000000", instaPay = null),
+            collector = com.breakfast.models.Collector(name = "iOS Tester", id = 64, image = null, phone = "01000000000", instaPay = null),
             date = "2025-11-01 14:00",
             totalPrice = 75.0
         ),
         HistoryModel(
             id = 102,
             status = null,
-            store = com.breakfast.models.Collector(name = "عم وحيد", id = 2, image = null),
-            collector = com.breakfast.models.Collector(name = "iOS Tester", id = 64, image = null),
+            store = com.breakfast.models.Collector(name = "عم وحيد", id = 2, image = null, phone = "01000000000", instaPay = null),
+            collector = com.breakfast.models.Collector(name = "iOS Tester", id = 64, image = null, phone = "01000000000", instaPay = null),
             date = "2025-11-01 16:30",
             totalPrice = 49.99
         )

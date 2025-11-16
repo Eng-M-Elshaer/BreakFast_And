@@ -47,9 +47,9 @@ class ProfileRepository(
     /**
      * Update the user's name, phone and email. On success, persist the updated user locally.
      */
-    suspend fun updateProfile(name: String, phone: String, email: String): Result<ApiResponse<UserModel>> {
+    suspend fun updateProfile(name: String, phone: String, email: String, instaPay: String?): Result<ApiResponse<UserModel>> {
         return try {
-            val request = UpdateProfileRequest(name, phone, email)
+            val request = UpdateProfileRequest(name, phone, email, instaPay)
             val userModel = apiService.updateProfile(request)
             val user = userModel.data?.user ?: throw Exception("User data is missing")
             preferenceManager.saveUser(user)

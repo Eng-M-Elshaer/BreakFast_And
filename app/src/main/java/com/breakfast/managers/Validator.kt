@@ -15,6 +15,13 @@ object Validator {
     private val EGYPT_PHONE_REGEX = Regex("^(010|011|012|015)[0-9]{8}$")
     // At least 8 chars, 1 lower, 1 upper, 1 digit
     private val PASSWORD_REGEX = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")
+    // Instapay links:
+    // - instapay.me / instapay.eg with a path token
+    // - ipn.eg/.../instapay/<token>
+    private val INSTAPAY_REGEX = Regex(
+        pattern = "^https?://(www\\.)?((instapay\\.me|instapay\\.eg)/[A-Za-z0-9._-]+|ipn\\.eg/.*/instapay/.+)$",
+        option = RegexOption.IGNORE_CASE
+    )
     // endregion
 
     // MARK: - Validation Methods
@@ -29,6 +36,23 @@ object Validator {
         val e = email.trim()
         // Keep parity with iOS regex AND leverage Android's built-in pattern for robustness
         return EMAIL_REGEX.matches(e) && Patterns.EMAIL_ADDRESS.matcher(e).matches()
+    }
+
+    /**
+     * InstaPay link validation.
+     * Matches:
+     *  - https://instapay.me/<token>
+     *  - https://instapay.eg/<token>
+     *  - https://ipn.eg/<any>/instapay/<token>
+     *  Case-insensitive, trims whitespace, and also checks Android URL utilities.
+     */
+    fun isValidInstaPayLink(link: String): Boolean {
+        val u = link.trim()
+        if (u.isEmpty()) return false
+        // Must match our explicit patterns AND be a valid network URL in Android sense
+        return INSTAPAY_REGEX.matches(u) &&
+                URLUtil.isNetworkUrl(u) &&
+                Patterns.WEB_URL.matcher(u).matches()
     }
 
     /** Basic 10-digit numeric phone (to mirror iOS example). */

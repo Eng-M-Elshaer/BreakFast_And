@@ -523,7 +523,7 @@ private fun CollectorDetailsScreenPreview() {
             price = 8.0,
             totalPrice = 16.0,
             note = "ssssss",
-            users = listOf(com.breakfast.models.Collector(id = 64, name = "iOS Tester", image = null)),
+            users = listOf(com.breakfast.models.Collector(id = 64, name = "iOS Tester", image = null, phone = null, instaPay = null)),
             orderItemID = 2
         )
     )
@@ -589,7 +589,9 @@ private data class OrderHistoryItemDisplayAdapter(
             com.breakfast.models.Collector(
                 id = id,
                 name = apiUser.name ?: "",
-                image = apiUser.image
+                image = apiUser.image,
+                phone = apiUser.phone,
+                instaPay = apiUser.instaPay
             )
         }
 }

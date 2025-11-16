@@ -29,7 +29,8 @@ data class RegisterRequest(
 data class UpdateProfileRequest(
     val name: String,
     val phone: String,
-    val email: String
+    val email: String,
+    @Json(name = "instapay_link") val instaPay: String? = null
 )
 
 @JsonClass(generateAdapter = true)

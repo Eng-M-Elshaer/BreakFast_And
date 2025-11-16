@@ -26,7 +26,8 @@ data class User(
     val email: String?,
     val status: StatusModel?,
     val phone: String?,
-    @Json(name = "profile_pic") val profilePic: String?
+    @Json(name = "profile_pic") val profilePic: String?,
+    @Json(name = "instapay_link") val instaPay: String?
 )
 
 @JsonClass(generateAdapter = true)
@@ -58,7 +59,9 @@ data class HomeModel(
 data class Collector(
     val id: Int?,
     val name: String?,
-    val image: String?
+    val image: String?,
+    val phone: String?,
+    @Json(name = "instapay_link") val instaPay: String?
 )
 
 @JsonClass(generateAdapter = true)
