@@ -299,7 +299,7 @@ private fun handleNotificationExtras(navController: NavController, extras: andro
                 navController.navigate("add_to_order/$orderId/$storeId")
             }
         }
-        "history" -> {
+        "history_detail" -> {
             val orderId = extras.getInt("orderId", 0)
             if (orderId > 0) {
                 navController.navigate("history_detail/$orderId")

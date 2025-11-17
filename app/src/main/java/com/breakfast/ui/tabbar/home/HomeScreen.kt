@@ -21,6 +21,8 @@ import com.breakfast.viewmodel.HomeViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -117,7 +119,17 @@ fun HomeScreen(navController: NavController? = null) {
     }
 
     BreakfastScreen(
-        title = stringResource(id = R.string.home_screen_title)
+        title = stringResource(id = R.string.home_screen_title),
+        rightAction = {
+            androidx.compose.material3.TextButton(onClick = { viewModel.fetchAboutUs() }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_info),
+                    tint = colorResource(R.color.blue_ribbon),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
     ) { innerPadding ->
         val isRefreshing = homeState.value is Result.Loading
         val swipeState = rememberSwipeRefreshState(isRefreshing = isRefreshing)

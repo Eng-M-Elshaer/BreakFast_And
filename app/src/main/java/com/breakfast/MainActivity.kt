@@ -57,6 +57,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        intent?.extras?.let { extras ->
+            if (!extras.isEmpty) {
+                NotificationNavRouter.dispatch(extras)
+            }
+        }
     }
 
     override fun onNewIntent(intent: android.content.Intent?) {

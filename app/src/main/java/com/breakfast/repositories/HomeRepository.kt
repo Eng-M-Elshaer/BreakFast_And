@@ -71,4 +71,17 @@ class HomeRepository(
             Result.Error(e.localizedMessage)
         }
     }
+
+    suspend fun getAboutUs(): Result<ApiResponse<Map<String, String>>> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.aboutUs()
+            Result.Success(response)
+        } catch (e: HttpException) {
+            Result.Error(e.response()?.errorBody()?.string())
+        } catch (e: IOException) {
+            Result.Error(context.getString(R.string.no_internet))
+        } catch (e: Exception) {
+            Result.Error(e.localizedMessage)
+        }
+    }
 }

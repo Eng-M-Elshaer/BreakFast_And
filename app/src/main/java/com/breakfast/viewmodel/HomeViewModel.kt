@@ -29,8 +29,19 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
     private val _startOrderState = MutableStateFlow<Result< ApiResponse<HomeModel>>>(Result.Loading)
     val startOrderState = _startOrderState.asStateFlow()
 
+    private val _aboutUsState = MutableStateFlow<Result<ApiResponse<Map<String, String>>>?>(null)
+    val aboutUsState = _aboutUsState.asStateFlow()
+
     init {
         fetchHome()
+    }
+
+    fun fetchAboutUs() {
+        viewModelScope.launch {
+            _aboutUsState.value = Result.Loading
+            val result = repository.getAboutUs()
+            _aboutUsState.value = result
+        }
     }
 
     fun fetchHome() {

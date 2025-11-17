@@ -224,5 +224,8 @@
     <string name="instapay_link_invaild">Instapay Link Invaild</string>
     <string name="pay_via_instapay">Pay via InstaPay</string>
     <string name="copied">Copied</string>
+    <string name="order_update">Order Update</string>
+    <string name="order_closed">Order #%1$s closed</string>
+    <string name="order_opened">Order #%1$s opened</string>
 
 </resources>

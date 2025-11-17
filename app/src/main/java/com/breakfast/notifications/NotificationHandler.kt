@@ -153,37 +153,6 @@ class NotificationHandler(private val context: Context) {
         notificationManager.notify(notificationId, builder.build())
     }
 
-    /**
-     * Show an order-specific notification with high priority.
-     */
-    fun showOrderNotification(orderId: String?, status: String?) {
-        val title = "Order Update"
-        val message = when (status) {
-            "confirmed" -> "Your order #$orderId has been confirmed"
-            "preparing" -> "Your order #$orderId is being prepared"
-            "ready" -> "Your order #$orderId is ready for pickup"
-            "delivered" -> "Your order #$orderId has been delivered"
-            else -> "Your order #$orderId has been updated"
-        }
-
-        showNotification(
-            title = title,
-            body = message,
-            channelId = CHANNEL_ORDERS
-        )
-    }
-
-    /**
-     * Show a promotional notification with low priority.
-     */
-    fun showPromotionNotification(title: String?, message: String?) {
-        showNotification(
-            title = title ?: "Special Offer",
-            body = message,
-            channelId = CHANNEL_PROMOTIONS
-        )
-    }
-
     private fun hasNotificationPermission(): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return true
